@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
     SMS message;
     private final String HASCONTACTS = "hasContacts";
     public static final String SHAREDPREFERENCENAME = "ContactNameAndNumbers";
-    SharedPreferences sharedPreference;
+    private SharedPreferences sharedPreference;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,17 +40,13 @@ public class MainActivity extends AppCompatActivity {
         perms = new HashMap<>();
         perms.put(Manifest.permission.SEND_SMS, PackageManager.PERMISSION_GRANTED);
         perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-        checkAndRequestPermissions();
         message = new SMS(getBaseContext());
         message.registerReceivers();
         notify = findViewById(R.id.notify);
         sharedPreference = getSharedPreferences(SHAREDPREFERENCENAME, MODE_PRIVATE);
-        sharedPreference.edit().putBoolean(HASCONTACTS,false).apply();
+        editor = sharedPreference.edit();
 
         checkAndRequestPermissions();
-
-        if(!sharedPreference.getBoolean(HASCONTACTS, false))
-            selectContacts();
 
         notify.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -71,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     if(entry.getKey().toString().equals(HASCONTACTS))
                         continue;
 
-                    message.sendSMS(entry.getKey().toString(), sms);
+                    message.sendSMS(entry.getKey().toString(), sms, entry.getValue().toString());
                 }
             }
         });
@@ -133,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
     }
 
     private void showDialogOK(String message, DialogInterface.OnClickListener okListener) {
@@ -142,6 +137,14 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("OK", okListener)
                 .create()
                 .show();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if(sharedPreference.getAll().size() == 0)
+            selectContacts();
     }
 
     @Override
@@ -161,18 +164,6 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<String,String> getAllContacts()
     {
         HashMap<String,String> nameAndPhone = new HashMap<>();
-//        String[] columns = {ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.HAS_PHONE_NUMBER};
-//        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,columns, null, null, null);
-//        while (cursor.moveToNext()) {
-//            String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-//            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-//            nameID.put(contactId,name);
-//        }
-//
-//        cursor.close();
-//        return nameID;
-
-
         Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
         while (phones.moveToNext())
         {
@@ -190,12 +181,10 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode==RESULT_OK)
         {
-            if(requestCode == REQUEST_CODE_PICK_CONTACT  )
+            if(requestCode == REQUEST_CODE_PICK_CONTACT)
             {
-                SharedPreferences.Editor editor = sharedPreference.edit();
                 Bundle bundle =  data.getExtras();
                 ArrayList<String> selectedContacts = bundle.getStringArrayList("result");
-                sharedPreference.edit().putBoolean(HASCONTACTS,true).apply();
 
                 HashMap<String,String> allContacts = getAllContacts();
                 for(int i =0; i < selectedContacts.size(); i++)
