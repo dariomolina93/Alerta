@@ -20,8 +20,9 @@ import java.util.Arrays;
 
 public class SMS
 {
-
+    //I'm not sure if to use context or activity, need to do some more research on the difference and better usage.
     private Activity applicationContext;
+    //These will serve as the receivers that notify when a message has been send/received
     private BroadcastReceiver messageSendReceiver, messageDeliveredReceiver;
     private final String SEND = "SMS_SEND";
     private final String DELIVERED = "SMS_DELIVERED";
@@ -34,6 +35,7 @@ public class SMS
         messageDeliveredReceiver = null;
     }
 
+    //notifying the result of the message send/received to each contact
     public void registerReceivers()
     {
         messageSendReceiver = new BroadcastReceiver() {
@@ -83,6 +85,7 @@ public class SMS
             }
         };
 
+        //register each receiver to start detecting when message send/received
         applicationContext.registerReceiver(messageSendReceiver, new IntentFilter(SEND));
         applicationContext.registerReceiver(messageDeliveredReceiver , new IntentFilter(DELIVERED));
     }
@@ -90,7 +93,6 @@ public class SMS
     public void sendSMS(String phoneNumber, String message, String name, int id)
     {
         Log.d("sendSMS", "registering pending intents for sms send and  sms delivered.");
-
         PendingIntent sentPI = PendingIntent.getBroadcast(applicationContext, id, new Intent(SEND).putExtra("name",name), PendingIntent.FLAG_ONE_SHOT);
         PendingIntent deliveredPI = PendingIntent.getBroadcast(applicationContext, id, new Intent(DELIVERED).putExtra("name",name), PendingIntent.FLAG_ONE_SHOT);
         SmsManager smsManager = SmsManager.getDefault();
