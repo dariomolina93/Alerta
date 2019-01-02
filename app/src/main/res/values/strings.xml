@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Alerta</string>
-    <string name="about">Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance.
-        The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..",
-        comes from a line in section 1.10.32.</string>
+    <string name="about">Contrary to popular belief, Lorem Ipsum is not simply random text.The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..",</string>
     <string name="location">Location: This permission is required so we can send the your location to your contact when you send their messsage...</string>
     <string name="contacts">Contacts: We need need permission to read your contacts so you can choose which contacts to contact in case of an emergency.....</string>
     <string name="sms">Text Messages(sms): We need this permission to be able to send a text message to your contacts in case of an emergency....</string>
@@ -10,4 +8,12 @@
     <string name="permissionAbout">These are the permissions that our app requires...We need them.....for this and that...
     </string>
     <string name="selectContacts">Click the forward arrow to grant access to permissions and select your contacts to send message...more.. and more...</string>
+    <string name="welcomeTitle">Welcome</string>
+    <string name="permissionTitle">Permission</string>
+    <string name="message2">Location: This permission is required so we can send the your location to your contact when you send their messsage...
+                             Call: We also need permission so you can make a phone call in case of an emergency.....</string>
+    <string name="message1">These app requires permission to access information from your phone.We need location, contact, sms and call.</string>
+    <string name="message3">Text Messages(sms): We need this permission to be able to send a text message to your contacts in case of an emergency....
+                            Contacts: We need need permission to read your contacts so you can choose which contacts to contact in case of an emergency.....</string>
+
 </resources>
