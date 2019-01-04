@@ -1,11 +1,15 @@
 package com.example.dariomolina.alerta;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -16,6 +20,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -27,6 +33,8 @@ public class AboutPermission extends AppCompatActivity {
     private SharedPreferences sharedPreference;
     private SharedPreferences.Editor editor;
     private final int REQUEST_CODE_PICK_CONTACT = 2;
+
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +187,7 @@ public class AboutPermission extends AppCompatActivity {
         return nameAndPhone;
     }
 
+    // Once the user finished selecting contacts, this method is called after
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode==RESULT_OK)
@@ -203,8 +212,10 @@ public class AboutPermission extends AppCompatActivity {
 
                     //simply get the key value from allContacts map, and store the contacts selected by the user in the sharedpreference object
                     //and store their number and name
-                    if(allContacts.get(phoneNumber) != null)
+                    if(allContacts.get(phoneNumber) != null) {
                         editor.putString(phoneNumber,allContacts.get(phoneNumber));
+                        insertContact(allContacts.get(phoneNumber), phoneNumber);
+                    }
 
                     //MARIO once you create the local Database, we can get rid of this portion and simply pass the values passed the numbers
                     //from the user without having to compare the and store the user's number and name.
@@ -217,6 +228,32 @@ public class AboutPermission extends AppCompatActivity {
                 return;
             }
         }
+    }
+
+    public void insertContact(String name, String phoneNumber) {
+        if (!phoneNumber.matches("[0-9]+")) {
+            Log.i("insertData", "Phone number incorrect format " + phoneNumber);
+        }
+
+        SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(this);
+        try{
+            this.db = alertaDB.getWritableDatabase();
+
+            ContentValues contactValues = new ContentValues();
+            contactValues.put(AlertaDatabaseHelper.CONTACT_NAME, name);
+            contactValues.put(AlertaDatabaseHelper.CONTACT_PHONE_NUMBER, phoneNumber);
+            this.db.insert(AlertaDatabaseHelper.TABLE_CONTACTS, null, contactValues);
+            Log.i("insertData", "Data added successfully");
+        } catch (SQLiteException e) {
+            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        db.close();
     }
 
 }

@@ -1,6 +1,10 @@
 package com.example.dariomolina.alerta;
 
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +18,9 @@ public class MainActivity extends AppCompatActivity{
 
     Button notify;
     SMS message;
+    private SQLiteDatabase db;
+    private Cursor cursorSelectedContacts;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,24 +30,33 @@ public class MainActivity extends AppCompatActivity{
         message.registerReceivers();
         notify = findViewById(R.id.notify);
 
-        notify.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                String sms = "Testing activities.";
-                Log.d("notifyEvent", "Sending Text Message");
+        SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(this);
+        try{
+            this.db = alertaDB.getReadableDatabase();
+            cursorSelectedContacts = db.query(AlertaDatabaseHelper.TABLE_CONTACTS,
+                                     new String[]{AlertaDatabaseHelper.CONTACT_NAME,
+                                                  AlertaDatabaseHelper.CONTACT_PHONE_NUMBER},
+                                     null, null, null, null, null);
 
-                SharedPreferences sharedPreference = getApplicationContext().getSharedPreferences("ContactNameAndNumbers", MODE_PRIVATE);
-                Map<String,?> keys = sharedPreference.getAll();
-                int i = 0;
-                for(Map.Entry<String,?> entry : keys.entrySet()){
+            notify.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    String sms = "Testing activities.";
+                    Log.d("notifyEvent", "Sending Text Message");
 
-                    String name = entry.getValue().toString();
-                    String phone = entry.getKey();
-                    message.sendSMS(phone, sms, name, i);
-                    i++;
+                    // Index represents the column return from the specified query call above. Ex name = 0, phone = 1
+                    int i = 0;
+                    while(cursorSelectedContacts.moveToNext()){
+                        String name = cursorSelectedContacts.getString(0);
+                        String phoneNumber = cursorSelectedContacts.getString(1);
+                        message.sendSMS(phoneNumber, sms, name, i);
+                        i++;
+                    }
                 }
-            }
-        });
+            });
+        }catch (SQLiteException e) {
+            Log.i("ReadData", "Can't read database");
+        }
     }
 
     @Override
@@ -48,5 +64,7 @@ public class MainActivity extends AppCompatActivity{
     {
         message.unRegisterReceivers();
         super.onDestroy();
+        db.close();
+        cursorSelectedContacts.close();
     }
 }
