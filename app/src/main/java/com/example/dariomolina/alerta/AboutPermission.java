@@ -41,6 +41,8 @@ public class AboutPermission extends AppCompatActivity {
         //prepopulating map with the required permission as key, and permission granted value as value
         perms.put(Manifest.permission.SEND_SMS, PackageManager.PERMISSION_GRANTED);
         perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
+        perms.put(Manifest.permission.CALL_PHONE, PackageManager.PERMISSION_GRANTED);
+        perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
 
         (findViewById(R.id.forwardButton)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +67,8 @@ public class AboutPermission extends AppCompatActivity {
         //store the int values of each value
         int smsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         int contactsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        int call =  ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
+        int location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
         //array to keep track of which permissions need to be requested
         ArrayList<String> permissionsNeeded = new ArrayList<>();
@@ -75,6 +79,12 @@ public class AboutPermission extends AppCompatActivity {
 
         if (smsPermission != PackageManager.PERMISSION_GRANTED)
             permissionsNeeded.add(Manifest.permission.SEND_SMS);
+
+        if (call != PackageManager.PERMISSION_GRANTED)
+            permissionsNeeded.add(Manifest.permission.CALL_PHONE);
+
+        if (location != PackageManager.PERMISSION_GRANTED)
+            permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
 
         //if the permissions are needed, make android request the permission with request ID I created
         if (!permissionsNeeded.isEmpty()) {
@@ -104,7 +114,9 @@ public class AboutPermission extends AppCompatActivity {
 
                     //all permissions have not been granted
                     if (perms.get(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
-                            || perms.get(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                            || perms.get(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED
+                            || perms.get(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED
+                            || perms.get(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                         Log.d("RequestPermissionResult", "One or both about_permissions are not granted.");
 
                         //permissions will be asked again and this will display the "never ask again" option

@@ -1,5 +1,12 @@
 package com.example.dariomolina.alerta.Fragments;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -10,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.dariomolina.alerta.GPSTracker;
+import com.example.dariomolina.alerta.MainActivity;
 import com.example.dariomolina.alerta.R;
 import com.example.dariomolina.alerta.SMS;
 import com.google.android.gms.ads.AdRequest;
@@ -26,12 +35,16 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class Home extends Fragment implements RewardedVideoAdListener {
 
-    Button notify;
-    SMS message;
+    private Button notify, call;
+    protected LocationManager locationManager, locationListener;
+    private SMS message;
+    private Context context;
     private AdView mAdView;
-    //private InterstitialAd mInterstitialAd;
     private RewardedVideoAd mRewardedVideoAd;
+    private double latitude, longitude;
+    private GPSTracker gpsTracker;
 
+    @SuppressLint("MissingPermission")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -41,6 +54,9 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         message = new SMS(getActivity());
         message.registerReceivers();
         notify = view.findViewById(R.id.notify);
+        call = view.findViewById(R.id.call);
+        gpsTracker = new GPSTracker(getContext());
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             MobileAds.initialize(getContext(), "ca-app-pub-3940256099942544~3347511713");
         }
@@ -49,22 +65,17 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
-//        mInterstitialAd = new InterstitialAd(this);
-//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-//        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getActivity());
         mRewardedVideoAd.setRewardedVideoAdListener(this);
 
         mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
                 new AdRequest.Builder().build());
 
-
-
         notify.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                String sms = "Testing activities.";
+                String sms = "Testing activities.\n " +
+                        "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
                 Log.d("notifyEvent", "Sending Text Message");
 
                 SharedPreferences sharedPreference = null;
@@ -85,6 +96,18 @@ public class Home extends Fragment implements RewardedVideoAdListener {
                 } else {
                     Log.d("TAG", "The interstitial wasn't loaded yet.");
                 }
+            }
+        });
+
+        call.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+
+                Log.d("callEvent", "Placing call");
+
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:cell#"));
+                startActivity(callIntent);
             }
         });
 
@@ -159,5 +182,4 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     public void onRewardedVideoCompleted() {
 
     }
-
 }
