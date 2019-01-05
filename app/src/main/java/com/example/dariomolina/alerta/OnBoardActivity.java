@@ -16,29 +16,28 @@ public class OnBoardActivity extends TutorialActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addFragment(new Step.Builder().setTitle(getString(R.string.welcomeTitle))
+        addFragment(new Step.Builder() .setTitle(getString(R.string.welcomeTitle))
                 .setContent(getString(R.string.about))
                 .setBackgroundColor(Color.parseColor("#e3c567"))
                 .setDrawable(R.drawable.welcome2)
                 .build());
 
-        addFragment(new Step.Builder().setTitle(getString(R.string.permissionTitle))
-                .setContent(getString(R.string.permissionAbout))
+        addFragment(new Step.Builder().setTitle(getString(R.string.permissionTitle1))
+                .setContent(getString(R.string.message1))
                 .setBackgroundColor(Color.parseColor("#c8963e"))
-                .setDrawable(R.drawable.permission1)
+                .setDrawable(R.drawable.permission2)
                 .build());
 
-        addFragment(new Step.Builder().setTitle("This is header")
-                .setContent("This is content")
-                .setBackgroundColor(Color.parseColor("#FF0957")) // int background color
-                .setDrawable(R.drawable.welcome2) // int top drawable
-                .setSummary("This is summary")
+        addFragment(new Step.Builder().setTitle(getString(R.string.permissionTitle2))
+                .setContent(getString(R.string.message2))
+                .setBackgroundColor(Color.parseColor("#831919")) // int background color
+                .setDrawable(R.drawable.permision1b) // int top drawable
                 .build());
 
-        addFragment(new Step.Builder().setTitle(getString(R.string.permissionTitle))
+        addFragment(new Step.Builder().setTitle(getString(R.string.permissionTitle3))
                 .setContent(getString(R.string.message3))
                 .setBackgroundColor(Color.parseColor("#573D1C"))
-                .setDrawable(R.drawable.testing2)
+                .setDrawable(R.drawable.permission3)
                 .build());
     }
 //        addFragment(
@@ -92,7 +91,7 @@ public class OnBoardActivity extends TutorialActivity {
 //
     @Override
     public void currentFragmentPosition(int position) {
-        Toast.makeText(this, "Position : " + position, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Position : " + position, Toast.LENGTH_SHORT).show();
     }
 
 }

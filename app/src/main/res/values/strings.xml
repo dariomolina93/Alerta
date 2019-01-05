@@ -9,11 +9,11 @@
     </string>
     <string name="selectContacts">Click the forward arrow to grant access to permissions and select your contacts to send message...more.. and more...</string>
     <string name="welcomeTitle">Welcome</string>
-    <string name="permissionTitle">Permission</string>
-    <string name="message2">Location: This permission is required so we can send the your location to your contact when you send their messsage...
-                             Call: We also need permission so you can make a phone call in case of an emergency.....</string>
+    <string name="permissionTitle1">Permission</string>
+    <string name="permissionTitle2">Location &amp; Call</string>
+    <string name="permissionTitle3">Text Message &amp; Contact</string>
+    <string name="message2">Location: This permission is required so we can send the your location to your contact when you send their messsage...\n\n Call: We also need permission so you can make a phone call in case of an emergency.....</string>
     <string name="message1">These app requires permission to access information from your phone.We need location, contact, sms and call.</string>
-    <string name="message3">Text Messages(sms): We need this permission to be able to send a text message to your contacts in case of an emergency....
-                            Contacts: We need need permission to read your contacts so you can choose which contacts to contact in case of an emergency.....</string>
+    <string name="message3">Text Messages(sms): We need this permission to be able to send a text message to your contacts in case of an emergency....\n\n Contacts: We need need permission to read your contacts so you can choose which contacts to contact in case of an emergency.....</string>
 
 </resources>
