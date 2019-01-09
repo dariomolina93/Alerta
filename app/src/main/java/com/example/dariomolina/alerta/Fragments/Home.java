@@ -63,9 +63,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
 
         mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
                 new AdRequest.Builder().build());
-
-
-
+        // Reading the database and retrieving the selected contacts
         SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(getContext());
         try{
             this.db = alertaDB.getReadableDatabase();
