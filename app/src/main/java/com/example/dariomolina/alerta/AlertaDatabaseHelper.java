@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-class AlertaDatabaseHelper extends SQLiteOpenHelper{
+public class AlertaDatabaseHelper extends SQLiteOpenHelper{
 
     private static final String DB_NAME = "Alerta";
     private static final int DB_VERSION = 1;
@@ -18,7 +18,7 @@ class AlertaDatabaseHelper extends SQLiteOpenHelper{
     public static final String CONTACT_TABLE_ID = "_id";
 
 
-    AlertaDatabaseHelper(Context context) {
+    public AlertaDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
