@@ -34,8 +34,8 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     //private InterstitialAd mInterstitialAd;
     private RewardedVideoAd mRewardedVideoAd;
 
-    private SQLiteDatabase db;
-    private Cursor cursorSelectedContacts;
+    private SQLiteDatabase dbR;
+    private Cursor selectedContactsCursor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,25 +64,21 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
                 new AdRequest.Builder().build());
         // Reading the database and retrieving the selected contacts
-        SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(getContext());
+        SQLiteOpenHelper alertadbR = new AlertaDatabaseHelper(getContext());
         try{
-            this.db = alertaDB.getReadableDatabase();
-            cursorSelectedContacts = db.query(AlertaDatabaseHelper.TABLE_CONTACTS,
-                    new String[]{AlertaDatabaseHelper.CONTACT_NAME,
-                            AlertaDatabaseHelper.CONTACT_PHONE_NUMBER},
-                    null, null, null, null, null);
-
+            this.dbR = alertadbR.getReadableDatabase();
+            selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
             notify.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
                     String sms = "Testing activities.";
                     Log.d("notifyEvent", "Sending Text Message");
 
-                    // Index represents the column return from the specified query call above. Ex name = 0, phone = 1
+                    // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
                     int i = 0;
-                    while(cursorSelectedContacts.moveToNext()){
-                        String name = cursorSelectedContacts.getString(0);
-                        String phoneNumber = cursorSelectedContacts.getString(1);
+                    while(selectedContactsCursor.moveToNext()){
+                        String name = selectedContactsCursor.getString(0);
+                        String phoneNumber = selectedContactsCursor.getString(1);
                         message.sendSMS(phoneNumber, sms, name, i);
                         i++;
                     }
@@ -96,7 +92,6 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         }catch (SQLiteException e) {
             Log.i("ReadData", "Can't read database");
         }
-
         return view;
     }
 
@@ -126,8 +121,8 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         }
         message.unRegisterReceivers();
         super.onDestroy();
-        db.close();
-        cursorSelectedContacts.close();
+        dbR.close();
+        selectedContactsCursor.close();
     }
 
     @Override

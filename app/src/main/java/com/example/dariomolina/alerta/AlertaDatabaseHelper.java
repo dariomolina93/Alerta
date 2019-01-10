@@ -1,9 +1,13 @@
 package com.example.dariomolina.alerta;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 public class AlertaDatabaseHelper extends SQLiteOpenHelper{
 
@@ -54,4 +58,44 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
             Log.i("AlertaDB", "Creating the MESSAGE table");
         }
     }
+
+    public static boolean addContactToDB(SQLiteDatabase db, String name, String phoneNumber) {
+        if (!phoneNumber.matches("[0-9]+")) {
+            Log.i("insertData", "Phone number incorrect format " + phoneNumber);
+            return false;
+        }
+
+        try{
+            ContentValues contactValues = new ContentValues();
+            contactValues.put(AlertaDatabaseHelper.CONTACT_NAME, name);
+            contactValues.put(AlertaDatabaseHelper.CONTACT_PHONE_NUMBER, phoneNumber);
+
+            db.insert(AlertaDatabaseHelper.TABLE_CONTACTS, null, contactValues);
+
+            Log.i("insertData", "Data added successfully");
+            return true;
+        } catch (SQLiteException e) {
+            Log.i("insertData", "Adding data FAILED");
+            Log.i("insertData", "ERROR " + e.toString());
+            return false;
+        }
+    }
+
+    public static Cursor getAllContacts(SQLiteDatabase db) {
+        Cursor selectedContactsCursor;
+        try{
+            selectedContactsCursor = db.query(AlertaDatabaseHelper.TABLE_CONTACTS,
+                    new String[]{AlertaDatabaseHelper.CONTACT_NAME,
+                                 AlertaDatabaseHelper.CONTACT_PHONE_NUMBER},
+                    null, null, null, null, null
+            );
+
+            Log.i("ReadData", "FAILED to get all contacts");
+            return selectedContactsCursor;
+        }catch (SQLiteException e) {
+            Log.i("ReadData", "FAILED to get all contacts");
+            return null;
+        }
+    }
+
 }
