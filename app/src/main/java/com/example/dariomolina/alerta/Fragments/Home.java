@@ -19,6 +19,7 @@ import android.widget.Button;
 
 import com.example.dariomolina.alerta.GPSTracker;
 import com.example.dariomolina.alerta.MainActivity;
+import com.example.dariomolina.alerta.Permissions;
 import com.example.dariomolina.alerta.R;
 import com.example.dariomolina.alerta.SMS;
 import com.google.android.gms.ads.AdRequest;
@@ -40,6 +41,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     private SMS message;
     private Context context;
     private AdView mAdView;
+    private Permissions permissions;
     private RewardedVideoAd mRewardedVideoAd;
     private double latitude, longitude;
     private GPSTracker gpsTracker;
@@ -51,6 +53,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         View view =  inflater.inflate(R.layout.home, container, false);
 
         super.onCreateView(inflater, container, savedInstanceState);
+        permissions = new Permissions(getActivity());
         message = new SMS(getActivity());
         message.registerReceivers();
         notify = view.findViewById(R.id.notify);
@@ -74,28 +77,9 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         notify.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                String sms = "Testing activities.\n " +
-                        "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
-                Log.d("notifyEvent", "Sending Text Message");
-
-                SharedPreferences sharedPreference = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    sharedPreference = getContext().getSharedPreferences("ContactNameAndNumbers", MODE_PRIVATE);
-                }
-                Map<String,?> keys = sharedPreference.getAll();
-                int i = 0;
-                for(Map.Entry<String,?> entry : keys.entrySet()){
-
-                    String name = entry.getValue().toString();
-                    String phone = entry.getKey();
-                    message.sendSMS(phone, sms, name, i);
-                    i++;
-                }
-                if (mRewardedVideoAd.isLoaded()) {
-                    mRewardedVideoAd.show();
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                }
+                permissions.checkAndRequestPermissions();
+                if(permissions.areAllPermissionsGranted())
+                    sendTextMessage();
             }
         });
 
@@ -114,6 +98,39 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         return view;
     }
 
+    public void sendTextMessage(){
+        String sms = "Testing activities.\n " +
+                "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
+        Log.d("notifyEvent", "Sending Text Message");
+
+        SharedPreferences sharedPreference = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            sharedPreference = getContext().getSharedPreferences("ContactNameAndNumbers", MODE_PRIVATE);
+        }
+        Map<String,?> keys = sharedPreference.getAll();
+        int i = 0;
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+
+            String name = entry.getValue().toString();
+            String phone = entry.getKey();
+            message.sendSMS(phone, sms, name, i);
+            i++;
+        }
+        if (mRewardedVideoAd.isLoaded()) {
+            mRewardedVideoAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult ( int requestCode, String permissions[], int[] grantResults) {
+        this.permissions.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (this.permissions.areAllPermissionsGranted()) {
+            sendTextMessage();
+        }
+    }
 
     @Override
     public void onResume() {
