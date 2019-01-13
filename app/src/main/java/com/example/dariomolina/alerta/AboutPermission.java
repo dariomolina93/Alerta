@@ -3,9 +3,11 @@ package com.example.dariomolina.alerta;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -16,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,17 +26,14 @@ public class AboutPermission extends AppCompatActivity {
 
     private final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     HashMap<String, Integer> perms;
-    public static final String SHAREDPREFERENCENAME = "ContactNameAndNumbers";
-    private SharedPreferences sharedPreference;
-    private SharedPreferences.Editor editor;
     private final int REQUEST_CODE_PICK_CONTACT = 2;
+
+    private SQLiteDatabase dbW;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about_permissions);
-        sharedPreference = getSharedPreferences(SHAREDPREFERENCENAME, MODE_PRIVATE);
-        editor = sharedPreference.edit();
 
         //map to retain permissions needed
         perms = new HashMap<>();
@@ -41,6 +41,14 @@ public class AboutPermission extends AppCompatActivity {
         //prepopulating map with the required permission as key, and permission granted value as value
         perms.put(Manifest.permission.SEND_SMS, PackageManager.PERMISSION_GRANTED);
         perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
+
+        SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(this);
+        try{
+            this.dbW = alertaDB.getReadableDatabase();
+        }catch (SQLiteException e){
+            Log.i("insertData", "Failed to get readable database");
+            Log.i("insertData", "ERROR: " + e.toString());
+        }
 
         (findViewById(R.id.forwardButton)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +92,6 @@ public class AboutPermission extends AppCompatActivity {
         //if all permissions are granted, let user select their contacts
         else{
             //for testing purposes I'm clearing the contacts each time
-            editor.clear().apply();
             selectContacts();
         }
     }
@@ -135,7 +142,6 @@ public class AboutPermission extends AppCompatActivity {
                     //if all permissions have been granted, then select contacts
                     else{
                         //clearing contacts selected for testing purposes
-                        editor.clear().apply();
                         selectContacts();
                     }
                 }
@@ -179,6 +185,7 @@ public class AboutPermission extends AppCompatActivity {
         return nameAndPhone;
     }
 
+    // Once the user finished selecting contacts, this method is called after
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode==RESULT_OK)
@@ -203,20 +210,31 @@ public class AboutPermission extends AppCompatActivity {
 
                     //simply get the key value from allContacts map, and store the contacts selected by the user in the sharedpreference object
                     //and store their number and name
-                    if(allContacts.get(phoneNumber) != null)
-                        editor.putString(phoneNumber,allContacts.get(phoneNumber));
-
-                    //MARIO once you create the local Database, we can get rid of this portion and simply pass the values passed the numbers
-                    //from the user without having to compare the and store the user's number and name.
+                    if(allContacts.get(phoneNumber) != null) {
+                        insertContact(allContacts.get(phoneNumber), phoneNumber);
+                    }
                 }
 
-                editor.apply();
                 //after contacts have been stored, simply send user to home screen
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 return;
             }
         }
+    }
+
+    public void insertContact(String name, String phoneNumber) {
+        if(this.dbW == null) {
+            Log.i("insertData", "FAILED: data is null");
+            return;
+        }
+        AlertaDatabaseHelper.addContactToDB(this.dbW, name, phoneNumber);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.dbW.close();
     }
 
 }

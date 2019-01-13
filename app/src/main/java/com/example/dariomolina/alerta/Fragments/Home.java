@@ -1,7 +1,10 @@
 package com.example.dariomolina.alerta.Fragments;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.app.Fragment;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.dariomolina.alerta.AlertaDatabaseHelper;
 import com.example.dariomolina.alerta.R;
 import com.example.dariomolina.alerta.SMS;
 import com.google.android.gms.ads.AdRequest;
@@ -20,8 +24,6 @@ import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
-import java.util.Map;
-
 import static android.content.Context.MODE_PRIVATE;
 
 public class Home extends Fragment implements RewardedVideoAdListener {
@@ -31,6 +33,9 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     private AdView mAdView;
     //private InterstitialAd mInterstitialAd;
     private RewardedVideoAd mRewardedVideoAd;
+
+    private SQLiteDatabase dbR;
+    private Cursor selectedContactsCursor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,36 +63,35 @@ public class Home extends Fragment implements RewardedVideoAdListener {
 
         mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
                 new AdRequest.Builder().build());
+        // Reading the database and retrieving the selected contacts
+        SQLiteOpenHelper alertadbR = new AlertaDatabaseHelper(getContext());
+        try{
+            this.dbR = alertadbR.getReadableDatabase();
+            selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
+            notify.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    String sms = "Testing activities.";
+                    Log.d("notifyEvent", "Sending Text Message");
 
-
-
-        notify.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                String sms = "Testing activities.";
-                Log.d("notifyEvent", "Sending Text Message");
-
-                SharedPreferences sharedPreference = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    sharedPreference = getContext().getSharedPreferences("ContactNameAndNumbers", MODE_PRIVATE);
+                    // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
+                    int i = 0;
+                    while(selectedContactsCursor.moveToNext()){
+                        String name = selectedContactsCursor.getString(0);
+                        String phoneNumber = selectedContactsCursor.getString(1);
+                        message.sendSMS(phoneNumber, sms, name, i);
+                        i++;
+                    }
+                    if (mRewardedVideoAd.isLoaded()) {
+                        mRewardedVideoAd.show();
+                    } else {
+                        Log.d("TAG", "The interstitial wasn't loaded yet.");
+                    }
                 }
-                Map<String,?> keys = sharedPreference.getAll();
-                int i = 0;
-                for(Map.Entry<String,?> entry : keys.entrySet()){
-
-                    String name = entry.getValue().toString();
-                    String phone = entry.getKey();
-                    message.sendSMS(phone, sms, name, i);
-                    i++;
-                }
-                if (mRewardedVideoAd.isLoaded()) {
-                    mRewardedVideoAd.show();
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                }
-            }
-        });
-
+            });
+        }catch (SQLiteException e) {
+            Log.i("ReadData", "Can't read database");
+        }
         return view;
     }
 
@@ -117,6 +121,8 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         }
         message.unRegisterReceivers();
         super.onDestroy();
+        dbR.close();
+        selectedContactsCursor.close();
     }
 
     @Override
