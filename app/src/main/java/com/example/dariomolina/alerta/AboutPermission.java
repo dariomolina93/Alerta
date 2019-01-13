@@ -3,9 +3,11 @@ package com.example.dariomolina.alerta;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -16,14 +18,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AboutPermission extends AppCompatActivity {
-
     private Permissions permissions;
-    private int j = 0;
     private final int REQUEST_CODE_PICK_CONTACT = 2;
+
+    private SQLiteDatabase dbW;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,13 @@ public class AboutPermission extends AppCompatActivity {
         setContentView(R.layout.about_permissions);
         permissions = new Permissions();
         permissions.setActivity(this);
+        SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(this);
+        try{
+            this.dbW = alertaDB.getReadableDatabase();
+        }catch (SQLiteException e){
+            Log.i("insertData", "Failed to get readable database");
+            Log.i("insertData", "ERROR: " + e.toString());
+        }
         (findViewById(R.id.forwardButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,7 +61,6 @@ public class AboutPermission extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public void onRequestPermissionsResult ( int requestCode, String permissions[], int[] grantResults){
         this.permissions.onRequestPermissionsResult(requestCode,permissions,grantResults);
@@ -87,6 +96,7 @@ public class AboutPermission extends AppCompatActivity {
         return nameAndPhone;
     }
 
+    // Once the user finished selecting contacts, this method is called after
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode==RESULT_OK)
@@ -111,20 +121,30 @@ public class AboutPermission extends AppCompatActivity {
 
                     //simply get the key value from allContacts map, and store the contacts selected by the user in the sharedpreference object
                     //and store their number and name
-                    if(allContacts.get(phoneNumber) != null)
-                        permissions.getEditor().putString(phoneNumber,allContacts.get(phoneNumber));
-
-                    //MARIO once you create the local Database, we can get rid of this portion and simply pass the values passed the numbers
-                    //from the user without having to compare the and store the user's number and name.
+                    if(allContacts.get(phoneNumber) != null) {
+                        insertContact(allContacts.get(phoneNumber), phoneNumber);
+                    }
                 }
-
-                permissions.getEditor().apply();
                 //after contacts have been stored, simply send user to home screen
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 return;
             }
         }
+    }
+
+    public void insertContact(String name, String phoneNumber) {
+        if(this.dbW == null) {
+            Log.i("insertData", "FAILED: data is null");
+            return;
+        }
+        AlertaDatabaseHelper.addContactToDB(this.dbW, name, phoneNumber);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.dbW.close();
     }
 
 }
