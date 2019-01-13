@@ -53,7 +53,8 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         View view =  inflater.inflate(R.layout.home, container, false);
 
         super.onCreateView(inflater, container, savedInstanceState);
-        permissions = new Permissions(getActivity());
+        permissions = new Permissions();
+        permissions.setActivity(getActivity());
         message = new SMS(getActivity());
         message.registerReceivers();
         notify = view.findViewById(R.id.notify);

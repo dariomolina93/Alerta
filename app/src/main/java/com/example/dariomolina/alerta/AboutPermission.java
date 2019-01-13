@@ -29,7 +29,8 @@ public class AboutPermission extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about_permissions);
-        permissions = new Permissions(this);
+        permissions = new Permissions();
+        permissions.setActivity(this);
         (findViewById(R.id.forwardButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
