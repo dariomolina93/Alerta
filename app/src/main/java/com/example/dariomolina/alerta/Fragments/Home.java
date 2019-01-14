@@ -95,7 +95,6 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         return view;
     }
 
-
     @Override
     public void onResume() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -111,7 +110,6 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         }
         super.onPause();
     }
-
 
     @Override
     public void onDestroy()
@@ -165,5 +163,4 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     public void onRewardedVideoCompleted() {
 
     }
-
 }

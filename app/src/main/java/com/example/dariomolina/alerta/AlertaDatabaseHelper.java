@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 public class AlertaDatabaseHelper extends SQLiteOpenHelper{
 
@@ -85,8 +84,8 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
         Cursor selectedContactsCursor;
         try{
             selectedContactsCursor = db.query(AlertaDatabaseHelper.TABLE_CONTACTS,
-                    new String[]{AlertaDatabaseHelper.CONTACT_NAME,
-                                 AlertaDatabaseHelper.CONTACT_PHONE_NUMBER},
+                    new String[]{AlertaDatabaseHelper.CONTACT_NAME, //Index 0
+                                 AlertaDatabaseHelper.CONTACT_PHONE_NUMBER}, //Index 1
                     null, null, null, null, null
             );
 
@@ -97,5 +96,4 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
             return null;
         }
     }
-
 }
