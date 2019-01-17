@@ -46,6 +46,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     private double latitude, longitude;
     private GPSTracker gpsTracker;
     private SQLiteDatabase dbR;
+    private SQLiteOpenHelper alertadbR;
     private Cursor selectedContactsCursor;
 
     @SuppressLint("MissingPermission")
@@ -78,7 +79,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
                 new AdRequest.Builder().build());
       
        // Reading the database and retrieving the selected contacts
-       SQLiteOpenHelper alertadbR = new AlertaDatabaseHelper(getContext());
+       alertadbR = new AlertaDatabaseHelper(getContext());
 
         notify.setOnClickListener(new View.OnClickListener(){
             @Override

@@ -1,20 +1,12 @@
 package com.example.dariomolina.alerta;
 
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -65,8 +57,7 @@ public class AboutPermission extends AppCompatActivity {
     public void onRequestPermissionsResult ( int requestCode, String permissions[], int[] grantResults){
         this.permissions.onRequestPermissionsResult(requestCode,permissions,grantResults);
         if(this.permissions.areAllPermissionsGranted()){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
+            selectContacts();
         }
     }
     //this launches the android ui to select the users contacts
