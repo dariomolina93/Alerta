@@ -31,14 +31,16 @@ public class Permissions extends Fragment{
     private int smsPermission;
     private int contactsPermission;
     private int call;
-    private int location;
+    private int gpsLocation;
+    private int networkLocation;
     private boolean allPermissionsGranted;
 
     public Permissions(){
         //map to retain permissions needed
         perms = new HashMap<>();
         allPermissionsGranted=false;
-        location=0;
+        gpsLocation=0;
+        networkLocation=0;
         call=0;
         contactsPermission=0;
         smsPermission=0;
@@ -48,6 +50,9 @@ public class Permissions extends Fragment{
         perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
         perms.put(Manifest.permission.CALL_PHONE, PackageManager.PERMISSION_GRANTED);
         perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
+        perms.put(Manifest.permission.INTERNET, PackageManager.PERMISSION_GRANTED);
+
+
     }
 
     public void setActivity(Activity activity) {
@@ -67,7 +72,9 @@ public class Permissions extends Fragment{
             smsPermission = activity.checkSelfPermission( Manifest.permission.SEND_SMS);
             contactsPermission = activity.checkSelfPermission( Manifest.permission.READ_CONTACTS);
             call = activity.checkSelfPermission(Manifest.permission.CALL_PHONE);
-            location = activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+            gpsLocation = activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+            networkLocation = activity.checkSelfPermission(Manifest.permission.INTERNET);
+
         }
         Log.d("check&RequestPermission", "After assigning values to permission variables");
             //array to keep track of which permissions need to be requested
@@ -87,8 +94,12 @@ public class Permissions extends Fragment{
                 permissionsNeeded.add(Manifest.permission.CALL_PHONE);
 
         Log.d("check&RequestPermission", "checking location permission");
-            if (location != PackageManager.PERMISSION_GRANTED)
+            if (gpsLocation != PackageManager.PERMISSION_GRANTED)
                 permissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        Log.d("check&RequestPermission", "checking location permission");
+        if (networkLocation != PackageManager.PERMISSION_GRANTED)
+            permissionsNeeded.add(Manifest.permission.INTERNET);
 
             //if the permissions are needed, make android request the permission with request ID I created
             if (!permissionsNeeded.isEmpty()) {
@@ -126,7 +137,8 @@ public class Permissions extends Fragment{
                         if (perms.get(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
                                 || perms.get(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED
                                 || perms.get(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED
-                                || perms.get(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                || perms.get(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                                || perms.get(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
                             Log.d("RequestPermissionResult", "One or both about_permissions are not granted.");
 
                             //permissions will be asked again and this will display the "never ask again" option
@@ -135,7 +147,8 @@ public class Permissions extends Fragment{
                                 if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)
                                         || shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)
                                         || shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE)
-                                        || shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                        || shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+                                        || shouldShowRequestPermissionRationale(Manifest.permission.INTERNET)) {
                                     Log.d("RequestPermissionResult", "Displaying alert dialog for requesting about_permissions.");
                                     showDialogOK("Permiso para leer contactos y mandar mensages son necesarios para utilizar la aplicacion.",
                                             new DialogInterface.OnClickListener() {
@@ -164,7 +177,8 @@ public class Permissions extends Fragment{
                                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.SEND_SMS)
                                         || ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.READ_CONTACTS)
                                         || ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.CALL_PHONE)
-                                        || ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.ACCESS_FINE_LOCATION)) {
+                                        || ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.ACCESS_FINE_LOCATION)
+                                        || ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.INTERNET)) {
                                     Log.d("RequestPermissionResult", "Displaying alert dialog for requesting about_permissions.");
                                     showDialogOK("Permiso para leer contactos y mandar mensages son necesarios para utilizar la aplicacion.",
                                             new DialogInterface.OnClickListener() {

@@ -48,6 +48,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     private SQLiteDatabase dbR;
     private SQLiteOpenHelper alertadbR;
     private Cursor selectedContactsCursor;
+    private Location location;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -63,6 +64,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         notify = view.findViewById(R.id.notify);
         call = view.findViewById(R.id.call);
         gpsTracker = new GPSTracker(getContext());
+        location = gpsTracker.getLocation();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             MobileAds.initialize(getContext(), "ca-app-pub-3940256099942544~3347511713");
@@ -109,6 +111,10 @@ public class Home extends Fragment implements RewardedVideoAdListener {
       try{
             this.dbR = alertadbR.getReadableDatabase();
             selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
+            if(!gpsTracker.canGetLocation()){
+                gpsTracker.showSettingsAlert();
+                return;
+            }
         String sms = "Testing activities.\n " +
                 "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
         Log.d("notifyEvent", "Sending Text Message");
@@ -145,6 +151,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
             mRewardedVideoAd.resume(getContext());
         }
         super.onResume();
+        location = gpsTracker.getLocation();
     }
 
     @Override
@@ -153,6 +160,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
             mRewardedVideoAd.pause(getContext());
         }
         super.onPause();
+        gpsTracker.stopUsingGPS();
     }
 
 
@@ -164,6 +172,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         }
         message.unRegisterReceivers();
         super.onDestroy();
+        gpsTracker.stopUsingGPS();
         dbR.close();
         selectedContactsCursor.close();
     }
