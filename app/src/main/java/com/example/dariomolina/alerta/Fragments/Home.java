@@ -173,8 +173,11 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         message.unRegisterReceivers();
         super.onDestroy();
         gpsTracker.stopUsingGPS();
-        dbR.close();
-        selectedContactsCursor.close();
+
+        if(dbR != null && selectedContactsCursor!= null) {
+            dbR.close();
+            selectedContactsCursor.close();
+        }
     }
 
     @Override

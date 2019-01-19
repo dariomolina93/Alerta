@@ -100,7 +100,7 @@ public class GPSTracker extends Service implements LocationListener {
     public boolean canGetLocation() {
         return isGPSEnabled || isNetworkEnabled;
     }
-    
+
     public void showSettingsAlert(){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
         alertDialog.setTitle("GPS Settings");
