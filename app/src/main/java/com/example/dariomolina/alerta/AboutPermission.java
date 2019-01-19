@@ -1,20 +1,12 @@
 package com.example.dariomolina.alerta;
 
-import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,9 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AboutPermission extends AppCompatActivity {
-
-    private final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
-    HashMap<String, Integer> perms;
+    private Permissions permissions;
     private final int REQUEST_CODE_PICK_CONTACT = 2;
 
     private SQLiteDatabase dbW;
@@ -34,14 +24,8 @@ public class AboutPermission extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about_permissions);
-
-        //map to retain permissions needed
-        perms = new HashMap<>();
-
-        //prepopulating map with the required permission as key, and permission granted value as value
-        perms.put(Manifest.permission.SEND_SMS, PackageManager.PERMISSION_GRANTED);
-        perms.put(Manifest.permission.READ_CONTACTS, PackageManager.PERMISSION_GRANTED);
-
+        permissions = new Permissions();
+        permissions.setActivity(this);
         SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(this);
         try{
             this.dbW = alertaDB.getReadableDatabase();
@@ -49,12 +33,15 @@ public class AboutPermission extends AppCompatActivity {
             Log.i("insertData", "Failed to get readable database");
             Log.i("insertData", "ERROR: " + e.toString());
         }
-
         (findViewById(R.id.forwardButton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                checkAndRequestPermissions();
-            }
+                permissions.checkAndRequestPermissions();
+                if(permissions.areAllPermissionsGranted()) {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                    }
+                }
         });
 
         (findViewById(R.id.backButton)).setOnClickListener(new View.OnClickListener() {
@@ -66,98 +53,13 @@ public class AboutPermission extends AppCompatActivity {
             }
         });
     }
-
-    private  void checkAndRequestPermissions() {
-        Log.d("check&RequestPermission", "checking the state of each permission.");
-
-        //store the int values of each value
-        int smsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-        int contactsPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-
-        //array to keep track of which permissions need to be requested
-        ArrayList<String> permissionsNeeded = new ArrayList<>();
-
-        //check if permissions have been granted
-        if (contactsPermission != PackageManager.PERMISSION_GRANTED)
-            permissionsNeeded.add(Manifest.permission.READ_CONTACTS);
-
-        if (smsPermission != PackageManager.PERMISSION_GRANTED)
-            permissionsNeeded.add(Manifest.permission.SEND_SMS);
-
-        //if the permissions are needed, make android request the permission with request ID I created
-        if (!permissionsNeeded.isEmpty()) {
-            Log.d("check&RequestPermission", "requesting permission");
-            ActivityCompat.requestPermissions(this, permissionsNeeded.toArray(new String[permissionsNeeded.size()]), REQUEST_ID_MULTIPLE_PERMISSIONS);
-        }
-        //if all permissions are granted, let user select their contacts
-        else{
-            //for testing purposes I'm clearing the contacts each time
+    @Override
+    public void onRequestPermissionsResult ( int requestCode, String permissions[], int[] grantResults){
+        this.permissions.onRequestPermissionsResult(requestCode,permissions,grantResults);
+        if(this.permissions.areAllPermissionsGranted()){
             selectContacts();
         }
     }
-
-    //this is called automatically after the permissions request
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            //request is the one I called for
-            case REQUEST_ID_MULTIPLE_PERMISSIONS: {
-                //check the permission results from the user
-                if (grantResults.length > 0) {
-                    Log.d("RequestPermissionResult", "grantResults array contains elements.");
-                    //setting the value of user permissions to the key value pair store previously
-                    for (int i = 0; i < permissions.length; i++)
-                        perms.put(permissions[i], grantResults[i]);
-
-                    //all permissions have not been granted
-                    if (perms.get(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
-                            || perms.get(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-                        Log.d("RequestPermissionResult", "One or both about_permissions are not granted.");
-
-                        //permissions will be asked again and this will display the "never ask again" option
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS) || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
-                            Log.d("RequestPermissionResult", "Displaying alert dialog for requesting about_permissions.");
-                            showDialogOK("Permiso para leer contactos y mandar mensages son necesarios para utilizar la aplicacion.",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            switch (which) {
-                                                case DialogInterface.BUTTON_POSITIVE:
-                                                    checkAndRequestPermissions();
-                                                    break;
-                                            }
-                                        }
-                                    });
-                        }
-                        //if the "never ask again" option has been selected, it will send the user to settings page so they can select
-                        //the permissions themselves.  They can't move forward until all permissions have been granted.
-                        else {
-                            Log.d("RequestPermissionResult", "Opening app setttings to manually enable about_permissions.");
-                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                            Uri uri = Uri.fromParts("package", getPackageName(), null);
-                            intent.setData(uri);
-                            startActivityForResult(intent, REQUEST_ID_MULTIPLE_PERMISSIONS);
-                        }
-                    }
-                    //if all permissions have been granted, then select contacts
-                    else{
-                        //clearing contacts selected for testing purposes
-                        selectContacts();
-                    }
-                }
-            }
-        }
-    }
-
-    //dialog box for showing message to urge user to allow permissions
-    private void showDialogOK(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .create()
-                .show();
-    }
-
     //this launches the android ui to select the users contacts
     private void selectContacts() {
         Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
@@ -214,7 +116,6 @@ public class AboutPermission extends AppCompatActivity {
                         insertContact(allContacts.get(phoneNumber), phoneNumber);
                     }
                 }
-
                 //after contacts have been stored, simply send user to home screen
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
