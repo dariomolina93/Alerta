@@ -1,5 +1,6 @@
 package com.example.dariomolina.alerta.Fragments;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -7,6 +8,9 @@ import android.os.Build;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,9 +20,12 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.dariomolina.alerta.AlertaDatabaseHelper;
+import com.example.dariomolina.alerta.ContactNamesAdapter;
 import com.example.dariomolina.alerta.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -37,7 +44,7 @@ public class Settings extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view =  inflater.inflate(R.layout.settings, container, false);
+        view = inflater.inflate(R.layout.settings, container, false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             MobileAds.initialize(getContext(), "ca-app-pub-3940256099942544~3347511713");
@@ -51,10 +58,12 @@ public class Settings extends Fragment implements View.OnClickListener {
             if(AlertaDatabaseHelper.getMessage(this.dbR) != null) {
                 this.setMessageToLayout(view);
             }
-
+            setContactsAdapter();
         }catch (SQLiteException e){
             Log.i("Database", "Failed to get writable database");
         }
+
+
 
         mAdView = view.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -116,6 +125,22 @@ public class Settings extends Fragment implements View.OnClickListener {
         TextView messageView = view.findViewById(R.id.message);
         String msg = AlertaDatabaseHelper.getMessage(this.dbR);
         messageView.setText(msg);
+    }
+
+    private void setContactsAdapter() {
+        RecyclerView recycleView = view.findViewById(R.id.contacts_recycler);
+        Cursor contactsCursor = AlertaDatabaseHelper.getAllContacts(dbR);
+        String[] names = new String[contactsCursor.getCount()];
+        int i = 0;
+        while(contactsCursor.moveToNext()) {
+            names[i++] = contactsCursor.getString(0);
+        }
+
+        ContactNamesAdapter contactsAdapter = new ContactNamesAdapter(names);
+        recycleView.setAdapter(contactsAdapter);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 1);
+        recycleView.setLayoutManager(layoutManager);
+
     }
 
     @Override

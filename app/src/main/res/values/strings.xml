@@ -16,4 +16,5 @@
     <string name="default_message">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</string>
     <string name="edit_button">EDIT</string>
     <string name="input_message">Enter new message</string>
+    <string name="contacts_title">Contacts</string>
 </resources>
