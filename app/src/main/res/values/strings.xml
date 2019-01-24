@@ -17,4 +17,6 @@
     <string name="edit_button">EDIT</string>
     <string name="input_message">Enter new message</string>
     <string name="contacts_title">Contacts</string>
+    <string name="remove_button">REMOVE</string>
+    <string name="add_button">ADD</string>
 </resources>

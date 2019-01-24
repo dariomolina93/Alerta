@@ -55,6 +55,12 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
         }
     }
 
+    public static boolean removeContact(SQLiteDatabase db, Contact contact) {
+        if(db == null || contact == null)
+            return false;
+        return db.delete(TABLE_CONTACTS, CONTACT_PHONE_NUMBER + "=?", new String[]{contact.getPhoneNumber()}) > 0;
+    }
+
     public static boolean addContactToDB(SQLiteDatabase db, String name, String phoneNumber) {
         if (!phoneNumber.matches("[0-9]+")) {
             Log.i("insertData", "Phone number incorrect format " + phoneNumber);

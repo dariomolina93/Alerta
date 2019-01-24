@@ -25,21 +25,30 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.dariomolina.alerta.AlertaDatabaseHelper;
+import com.example.dariomolina.alerta.Contact;
 import com.example.dariomolina.alerta.ContactNamesAdapter;
 import com.example.dariomolina.alerta.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
+import java.util.ArrayList;
+
 public class Settings extends Fragment implements View.OnClickListener {
 
     private AdView mAdView;
     private TextInputEditText inputMessage;
     private Button editButton;
+    private Button removeButton;
+    private Button addButton;
     private SQLiteDatabase dbW;
     private SQLiteDatabase dbR;
     private View view;
     private View inputLayout;
+    private ContactNamesAdapter contactsAdapter;
+
+    private ArrayList<Contact> removeContacts;
+    private ArrayList<Contact> contacts;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,6 +81,9 @@ public class Settings extends Fragment implements View.OnClickListener {
         //Attaching the listener to the buttons
         editButton = view.findViewById(R.id.edit_button);
         editButton.setOnClickListener(this);
+        removeButton = view.findViewById(R.id.delete_button);
+        removeButton.setOnClickListener(this);
+        addButton = view.findViewById(R.id.add_button);
 
         inputLayout = view.findViewById(R.id.input_message_layout);
         inputMessage = view.findViewById(R.id.input_message);
@@ -80,7 +92,6 @@ public class Settings extends Fragment implements View.OnClickListener {
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 Log.i("DoneK", "Button id: " + id);
                 if (id == EditorInfo.IME_ACTION_DONE) {
-                    Log.i("DoneK","Done button pressed");
                     Log.i("DoneK", "Input entered by user: " + inputMessage.getText().toString());
                     AlertaDatabaseHelper.setMessage(dbW, inputMessage.getText().toString());
                     setMessageToLayout(view);
@@ -99,7 +110,27 @@ public class Settings extends Fragment implements View.OnClickListener {
         switch(v.getId()) {
             case R.id.edit_button:
                 this.onClickEdit();
+            case R.id.delete_button:
+                this.onClickRemove();
+            case R.id.add_button:
+                this.onClickAdd();
         }
+    }
+
+    private void onClickAdd() {
+    }
+
+    private void onClickRemove() {
+        int position;
+
+        for (int i = 0; i < removeContacts.size(); i++) {
+            position = contacts.indexOf(removeContacts.get(i));
+            this.contacts.remove(removeContacts.get(i));
+            this.contactsAdapter.notifyItemRemoved(position);
+            //TODO: Remove selected contacts from database uncomment line below
+            //AlertaDatabaseHelper.removeContact(dbR, removeContacts.get(i));
+        }
+        removeContacts.clear();
     }
 
     private void onClickEdit() {
@@ -130,17 +161,35 @@ public class Settings extends Fragment implements View.OnClickListener {
     private void setContactsAdapter() {
         RecyclerView recycleView = view.findViewById(R.id.contacts_recycler);
         Cursor contactsCursor = AlertaDatabaseHelper.getAllContacts(dbR);
-        String[] names = new String[contactsCursor.getCount()];
-        int i = 0;
+        this.contacts = new ArrayList<>();
+        this.removeContacts = new ArrayList<>();
+
         while(contactsCursor.moveToNext()) {
-            names[i++] = contactsCursor.getString(0);
+            this.contacts.add(new Contact(contactsCursor.getString(0),
+                    contactsCursor.getString(1),
+                    contactsCursor.getString(2)));
         }
 
-        ContactNamesAdapter contactsAdapter = new ContactNamesAdapter(names);
+        this.contactsAdapter = new ContactNamesAdapter(contacts);
         recycleView.setAdapter(contactsAdapter);
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 1);
         recycleView.setLayoutManager(layoutManager);
 
+        this.contactsAdapter.setListener(new ContactNamesAdapter.Listener() {
+            @Override
+            public void onClick(int position) {
+                Log.i("ContactsLis", "Contact selected " + position);
+            }
+
+            @Override
+            public void onClickCheckBox(Contact contact, boolean isChecked) {
+                if (isChecked) {
+                    removeContacts.add(contact);
+                } else {
+                    removeContacts.remove(contact);
+                }
+            }
+        });
     }
 
     @Override
