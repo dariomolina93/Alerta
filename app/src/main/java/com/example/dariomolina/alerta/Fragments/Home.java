@@ -68,10 +68,17 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         try{
             this.dbR = alertadbR.getReadableDatabase();
             selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
+
             notify.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v){
-                    String sms = "Testing activities.";
+                    String msg = AlertaDatabaseHelper.getMessage(dbR);
+                    String sms;
+                    if(msg == null) {
+                        sms = getString(R.string.default_message);
+                    } else {
+                        sms = msg;
+                    }
                     Log.d("notifyEvent", "Sending Text Message");
 
                     // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
