@@ -45,6 +45,6 @@ public class Contact {
 
         Contact c = (Contact) o;
 
-        return c.phoneNumber == this.phoneNumber;
+        return c.phoneNumber.equals(this.phoneNumber);
     }
 }
