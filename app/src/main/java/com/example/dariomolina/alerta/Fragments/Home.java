@@ -80,8 +80,13 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
                 new AdRequest.Builder().build());
       
-       // Reading the database and retrieving the selected contacts
+       // Reading the database
        alertadbR = new AlertaDatabaseHelper(getContext());
+       try{
+           this.dbR = alertadbR.getReadableDatabase();
+       }catch (SQLiteException e){
+           Log.i("DatabaseError", "Could not open a readable database");
+       }
 
         notify.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -109,33 +114,40 @@ public class Home extends Fragment implements RewardedVideoAdListener {
 
     public void sendTextMessage(){
       try{
-            this.dbR = alertadbR.getReadableDatabase();
-            selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
-            if(!gpsTracker.canGetLocation()){
-                gpsTracker.showSettingsAlert();
-                return;
-            }
-        String sms = "Testing activities.\n " +
-                "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
-        Log.d("notifyEvent", "Sending Text Message");
+          selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
 
-        // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
-        int i = 0;
-        while(selectedContactsCursor.moveToNext()){
-            String name = selectedContactsCursor.getString(0);
-            String phoneNumber = selectedContactsCursor.getString(1);
-            message.sendSMS(phoneNumber, sms, name, i);
-            i++;
-        }
-        if (mRewardedVideoAd.isLoaded()) {
-           mRewardedVideoAd.show();
-        } else {
-            Log.d("TAG", "The interstitial wasn't loaded yet.");
-        }
+          if(!gpsTracker.canGetLocation()){
+              gpsTracker.showSettingsAlert();
+              return;
+          }
+          String msg = AlertaDatabaseHelper.getMessage(dbR);
+          String sms;
+          if(msg == null) {
+              sms = getString(R.string.default_message);
+          } else {
+              sms = msg;
+          }
+          sms += "\n" + "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
+          Log.d("notifyEvent", "Sending Text Message");
+
+          // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
+          int i = 0;
+          while(selectedContactsCursor.moveToNext()){
+              String name = selectedContactsCursor.getString(0);
+              String phoneNumber = selectedContactsCursor.getString(1);
+              message.sendSMS(phoneNumber, sms, name, i);
+              i++;
+          }
+          if (mRewardedVideoAd.isLoaded()) {
+              mRewardedVideoAd.show();
+          } else {
+              Log.d("TAG", "The interstitial wasn't loaded yet.");
+          }
       }catch (SQLiteException e) {
           Log.i("ReadData", "Can't read database");
       }
     }
+
 
     @Override
     public void onRequestPermissionsResult ( int requestCode, String permissions[], int[] grantResults) {
@@ -162,7 +174,6 @@ public class Home extends Fragment implements RewardedVideoAdListener {
         super.onPause();
         gpsTracker.stopUsingGPS();
     }
-
 
     @Override
     public void onDestroy()

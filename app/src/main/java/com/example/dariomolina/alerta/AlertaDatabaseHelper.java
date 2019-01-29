@@ -23,7 +23,6 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
     public static final String TABLE_MESSAGE = "MESSAGE";
     public static final String TEXT_MESSAGE = "SMS";
     public static final String MESSAGE_TABLE_ID = "_id";
-    public static final String MESSAGE_TABLE_FOREIGN_KEY_CONTACTS = CONTACT_TABLE_ID;
 
     public AlertaDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -50,12 +49,16 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
             Log.i("AlertaDB", "Creating the CONTACTS table");
 
             db.execSQL("CREATE TABLE " + TABLE_MESSAGE + " (" + MESSAGE_TABLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    + TEXT_MESSAGE + " TEXT, "
-                    + "FOREIGN KEY(" + MESSAGE_TABLE_FOREIGN_KEY_CONTACTS + ") "
-                    + "REFERENCES " + TABLE_CONTACTS + "(" + MESSAGE_TABLE_FOREIGN_KEY_CONTACTS + "));"
+                    + TEXT_MESSAGE + " TEXT);"
             );
             Log.i("AlertaDB", "Creating the MESSAGE table");
         }
+    }
+
+    public static boolean removeContact(SQLiteDatabase db, Contact contact) {
+        if(db == null || contact == null)
+            return false;
+        return db.delete(TABLE_CONTACTS, CONTACT_PHONE_NUMBER + "=?", new String[]{contact.getPhoneNumber()}) > 0;
     }
 
     public static boolean addContactToDB(SQLiteDatabase db, String name, String phoneNumber) {
@@ -84,8 +87,9 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
         Cursor selectedContactsCursor;
         try{
             selectedContactsCursor = db.query(AlertaDatabaseHelper.TABLE_CONTACTS,
-                    new String[]{AlertaDatabaseHelper.CONTACT_NAME,
-                                 AlertaDatabaseHelper.CONTACT_PHONE_NUMBER},
+                    new String[]{AlertaDatabaseHelper.CONTACT_NAME, //Index 0
+                                 AlertaDatabaseHelper.CONTACT_PHONE_NUMBER, //Index 1
+                                 AlertaDatabaseHelper.CONTACT_TABLE_ID}, //Index 2
                     null, null, null, null, null
             );
 
@@ -97,4 +101,31 @@ public class AlertaDatabaseHelper extends SQLiteOpenHelper{
         }
     }
 
+    public static void setMessage(SQLiteDatabase db, String message) {
+        if(message.equals(""))
+            return;
+        try{
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(AlertaDatabaseHelper.TEXT_MESSAGE, message);
+            db.insert(AlertaDatabaseHelper.TABLE_MESSAGE, null, contentValues);
+        } catch(SQLiteException e) {
+            Log.i("InsertData", "Failed to insert message");
+        }
+    }
+
+    public static String getMessage(SQLiteDatabase db) {
+        Cursor messageCursor;
+        try{
+            messageCursor = db.query(AlertaDatabaseHelper.TABLE_MESSAGE,
+                    new String[]{AlertaDatabaseHelper.TEXT_MESSAGE}, //Index 0
+                    null, null, null, null, null
+            );
+            if(messageCursor.moveToLast())
+                return messageCursor.getString(0);
+            return null;
+        }catch (SQLiteException e) {
+            Log.i("GetMessage","Failed to retrieve message");
+        }
+        return null;
+    }
 }

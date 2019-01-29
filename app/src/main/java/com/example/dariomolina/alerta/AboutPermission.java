@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 public class AboutPermission extends AppCompatActivity {
     private Permissions permissions;
-    private final int REQUEST_CODE_PICK_CONTACT = 2;
+    public static final int REQUEST_CODE_PICK_CONTACT = 2;
 
     private SQLiteDatabase dbW;
 
