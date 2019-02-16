@@ -10,4 +10,13 @@
     <string name="permissionAbout">These are the permissions that our app requires...We need them.....for this and that...
     </string>
     <string name="selectContacts">Click the forward arrow to grant access to permissions and select your contacts to send message...more.. and more...</string>
+
+    <!-- Settings view layout -->
+    <string name="message_title">Message</string>
+    <string name="default_message">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</string>
+    <string name="edit_button">EDIT</string>
+    <string name="input_message">Enter new message</string>
+    <string name="contacts_title">Contacts</string>
+    <string name="remove_button">REMOVE</string>
+    <string name="add_button">ADD</string>
 </resources>
