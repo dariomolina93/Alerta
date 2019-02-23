@@ -34,16 +34,13 @@ import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import static android.content.Context.MODE_PRIVATE;
 
-public class Home extends Fragment implements RewardedVideoAdListener {
+public class Home extends Fragment{
 
     private Button notify, call;
-    protected LocationManager locationManager, locationListener;
     private SMS message;
-    private Context context;
-    private AdView mAdView;
+    private AdView bannerAd;
+    private InterstitialAd interstitialAd;
     private Permissions permissions;
-    private RewardedVideoAd mRewardedVideoAd;
-    private double latitude, longitude;
     private GPSTracker gpsTracker;
     private SQLiteDatabase dbR;
     private SQLiteOpenHelper alertadbR;
@@ -54,6 +51,7 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view =  inflater.inflate(R.layout.home, container, false);
 
         super.onCreateView(inflater, container, savedInstanceState);
@@ -70,15 +68,12 @@ public class Home extends Fragment implements RewardedVideoAdListener {
             MobileAds.initialize(getContext(), "ca-app-pub-3940256099942544~3347511713");
         }
 
-        mAdView = view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        bannerAd = view.findViewById(R.id.adView);
+        bannerAd.loadAd(new AdRequest.Builder().build());
 
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getActivity());
-        mRewardedVideoAd.setRewardedVideoAdListener(this);
-
-        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
-                new AdRequest.Builder().build());
+        interstitialAd = new InterstitialAd(getActivity());
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/5224354917");
+        interstitialAd.loadAd(new AdRequest.Builder().build());
       
        // Reading the database
        alertadbR = new AlertaDatabaseHelper(getContext());
@@ -92,8 +87,8 @@ public class Home extends Fragment implements RewardedVideoAdListener {
             @Override
             public void onClick(View v){
                 permissions.checkAndRequestPermissions();
-                if(permissions.areAllPermissionsGranted())
-                    sendTextMessage();
+                if(permissions.areAllPermissionsGranted()) sendTextMessage();
+                interstitialAd.loadAd(new AdRequest.Builder().build());
             }
         });
 
@@ -114,35 +109,39 @@ public class Home extends Fragment implements RewardedVideoAdListener {
 
     public void sendTextMessage(){
       try{
-          selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
+            this.dbR = alertadbR.getReadableDatabase();
+            selectedContactsCursor = AlertaDatabaseHelper.getAllContacts(this.dbR);
+            if(!gpsTracker.canGetLocation()){
+                gpsTracker.showSettingsAlert();
+                return;
+            }
 
-          if(!gpsTracker.canGetLocation()){
-              gpsTracker.showSettingsAlert();
-              return;
-          }
           String msg = AlertaDatabaseHelper.getMessage(dbR);
           String sms;
+
           if(msg == null) {
               sms = getString(R.string.default_message);
           } else {
               sms = msg;
           }
           sms += "\n" + "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
-          Log.d("notifyEvent", "Sending Text Message");
 
-          // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
-          int i = 0;
-          while(selectedContactsCursor.moveToNext()){
-              String name = selectedContactsCursor.getString(0);
-              String phoneNumber = selectedContactsCursor.getString(1);
-              message.sendSMS(phoneNumber, sms, name, i);
-              i++;
-          }
-          if (mRewardedVideoAd.isLoaded()) {
-              mRewardedVideoAd.show();
-          } else {
-              Log.d("TAG", "The interstitial wasn't loaded yet.");
-          }
+        Log.d("notifyEvent", "Sending Text Message");
+
+        // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
+        int i = 0;
+        while(selectedContactsCursor.moveToNext()){
+            String name = selectedContactsCursor.getString(0);
+            String phoneNumber = selectedContactsCursor.getString(1);
+            message.sendSMS(phoneNumber, sms, name, i);
+            i++;
+        }
+        if (interstitialAd.isLoaded()) {
+            interstitialAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+
       }catch (SQLiteException e) {
           Log.i("ReadData", "Can't read database");
       }
@@ -159,18 +158,13 @@ public class Home extends Fragment implements RewardedVideoAdListener {
 
     @Override
     public void onResume() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mRewardedVideoAd.resume(getContext());
-        }
+        interstitialAd.loadAd(new AdRequest.Builder().build());
         super.onResume();
         location = gpsTracker.getLocation();
     }
 
     @Override
     public void onPause() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mRewardedVideoAd.pause(getContext());
-        }
         super.onPause();
         gpsTracker.stopUsingGPS();
     }
@@ -178,9 +172,6 @@ public class Home extends Fragment implements RewardedVideoAdListener {
     @Override
     public void onDestroy()
     {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mRewardedVideoAd.pause(getContext());
-        }
         message.unRegisterReceivers();
         super.onDestroy();
         gpsTracker.stopUsingGPS();
@@ -189,46 +180,5 @@ public class Home extends Fragment implements RewardedVideoAdListener {
             dbR.close();
             selectedContactsCursor.close();
         }
-    }
-
-    @Override
-    public void onRewardedVideoAdLoaded() {
-
-    }
-
-    @Override
-    public void onRewardedVideoAdOpened() {
-
-    }
-
-    @Override
-    public void onRewardedVideoStarted() {
-
-    }
-
-    @Override
-    public void onRewardedVideoAdClosed() {
-        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
-                new AdRequest.Builder().build());
-    }
-
-    @Override
-    public void onRewarded(RewardItem rewardItem) {
-
-    }
-
-    @Override
-    public void onRewardedVideoAdLeftApplication() {
-
-    }
-
-    @Override
-    public void onRewardedVideoAdFailedToLoad(int i) {
-
-    }
-
-    @Override
-    public void onRewardedVideoCompleted() {
-
     }
 }
