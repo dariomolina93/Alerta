@@ -4,35 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@color/colorPrimary">
 
 
     <Button
         android:id="@+id/notify"
-        android:layout_width="182dp"
-        android:layout_height="190dp"
+        android:layout_width="0dp"
+        android:layout_height="222dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/notifybutton5"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/notify_final"
         android:gravity="center"
+        android:text="                 Notify"
+        android:textColor="@color/colorPrimary"
+        android:textSize="42dp"
         app:layout_constraintBottom_toTopOf="@+id/call"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline" />
 
+
+
     <Button
         android:id="@+id/call"
-        android:layout_width="182dp"
-        android:layout_height="190dp"
+        android:layout_width="0dp"
+        android:layout_height="222dp"
         android:layout_below="@+id/notify"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/callbutton5"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/call_final"
         android:gravity="center"
+        android:text="           Call"
+        android:textColor="@color/colorPrimary"
+        android:textSize="42dp"
         app:layout_constraintBottom_toTopOf="@+id/adView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/notify" />
 
