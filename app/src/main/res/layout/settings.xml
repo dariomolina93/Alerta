@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
@@ -92,6 +93,7 @@
                     android:focusableInTouchMode="true"
                     android:hint="@string/input_message"
                     android:inputType="textImeMultiLine"
+                    android:imeOptions="actionDone"
                     android:visibility="gone" />
 
             </android.support.design.widget.TextInputLayout>

@@ -142,7 +142,6 @@ public class Settings extends Fragment implements View.OnClickListener {
             position = contacts.indexOf(removeContacts.get(i));
             this.contacts.remove(removeContacts.get(i));
             this.contactsAdapter.notifyItemRemoved(position);
-            //TODO: Remove selected contacts from database uncomment line below
             AlertaDatabaseHelper.removeContact(dbR, removeContacts.get(i));
         }
         removeContacts.clear();
@@ -244,7 +243,6 @@ public class Settings extends Fragment implements View.OnClickListener {
         Log.i("insertData", "Name: " + name + " phoneNumber: " + phoneNumber);
         if (!contacts.contains(newContact)) {
             AlertaDatabaseHelper.addContactToDB(this.dbW, name, phoneNumber);
-        // TODO: Get the correct ID
             contacts.add(new Contact(name, phoneNumber, "0"));
             contactsAdapter.notifyItemInserted(size);
         }else {

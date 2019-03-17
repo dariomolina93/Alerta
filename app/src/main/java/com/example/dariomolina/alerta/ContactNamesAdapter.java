@@ -11,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ContactNamesAdapter extends RecyclerView.Adapter<ContactNamesAdapter.ViewHolder> {
 
@@ -61,11 +62,14 @@ public class ContactNamesAdapter extends RecyclerView.Adapter<ContactNamesAdapte
         TextView textView = cardView.findViewById(R.id.name_text);
         textView.setText(contact.getName());
         CheckBox checkBox = cardView.findViewById(R.id.checkBox);
-        checkBox.setChecked(false);
+        checkBox.setOnCheckedChangeListener(null);
+        checkBox.setChecked(contact.getIsSelected());
+
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(listener != null) {
+                    contact.setIsSelected(isChecked);
                     listener.onClickCheckBox(contact, isChecked);
                 }
             }
