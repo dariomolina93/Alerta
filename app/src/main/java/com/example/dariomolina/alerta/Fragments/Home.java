@@ -19,6 +19,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
+
 import com.example.dariomolina.alerta.GPSTracker;
 import com.example.dariomolina.alerta.MainActivity;
 import com.example.dariomolina.alerta.Permissions;
@@ -65,14 +67,14 @@ public class Home extends Fragment{
         location = gpsTracker.getLocation();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            MobileAds.initialize(getContext(), "ca-app-pub-3940256099942544~3347511713");
+            MobileAds.initialize(getContext(), "ca-app-pub-4491011983892764~9524664327");
         }
 
         bannerAd = view.findViewById(R.id.adView);
         bannerAd.loadAd(new AdRequest.Builder().build());
 
         interstitialAd = new InterstitialAd(getActivity());
-        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/5224354917");
+        interstitialAd.setAdUnitId("ca-app-pub-4491011983892764/2611179020");
         interstitialAd.loadAd(new AdRequest.Builder().build());
       
        // Reading the database
@@ -98,8 +100,7 @@ public class Home extends Fragment{
 
                 Log.d("callEvent", "Placing call");
 
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:cell#"));
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
                 startActivity(callIntent);
             }
         });
@@ -124,7 +125,7 @@ public class Home extends Fragment{
           } else {
               sms = msg;
           }
-          sms += "\n" + "http://maps.google.com/maps?saddr=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
+          sms += "\n\n" + "Direccion donde se encuentra su contacto: http://maps.google.com/?q=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
 
         Log.d("notifyEvent", "Sending Text Message");
 
@@ -136,10 +137,16 @@ public class Home extends Fragment{
             message.sendSMS(phoneNumber, sms, name, i);
             i++;
         }
-        if (interstitialAd.isLoaded()) {
-            interstitialAd.show();
-        } else {
-            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        if(i != 0) {
+            if (interstitialAd.isLoaded()) {
+                interstitialAd.show();
+            } else {
+                Log.d("TAG", "The interstitial wasn't loaded yet.");
+            }
+        }
+
+        else {
+            Toast.makeText(getActivity(),"Porfavor seleccione contactos para mandar mensaje de texto.", Toast.LENGTH_LONG).show();
         }
 
       }catch (SQLiteException e) {
