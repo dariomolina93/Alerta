@@ -29,6 +29,7 @@ public class Rights extends Fragment {
     private AdView mAdView;
     private String[] rights;
     private String[] description;
+    private String tabName = "Derechos";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -100,5 +101,9 @@ public class Rights extends Fragment {
 
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(itemClickListener);
+    }
+
+    public String getTabName() {
+        return tabName;
     }
 }

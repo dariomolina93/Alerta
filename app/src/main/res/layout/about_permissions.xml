@@ -33,7 +33,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:text="Permission"
+        android:text="@string/Permission"
         android:textAlignment="center"
         android:textSize="45sp"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
