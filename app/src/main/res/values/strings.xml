@@ -1,39 +1,49 @@
 <resources>
     <string name="app_name">Alerta</string>
-    <string name="about">Contrary to popular belief, Lorem I",
-        comes from a line in section 1.10.32.</string>
-    <string name="location">Location: This permission is required so we can send the your location to your contact when you send their messsage...</string>
-    <string name="contacts">Contacts: We need need permission to read your contacts so you can choose which contacts to contact in case of an emergency.....</string>
-    <string name="sms">Text Messages(sms): We need this permission to be able to send a text message to your contacts in case of an emergency....</string>
-    <string name="call">Call: We also need permission so you can make a phone call in case of an emergency.....</string>
-    <string name="permissionAbout">These are the permissions that our app requires...We need them.....for this and that...
-    </string>
-    <string name="selectContacts">Click the forward arrow to grant access to permissions and select your contacts to send message...more.. and more...</string>
+    <string name="about"></string>
+    <string name="Permission">Permiso</string>
+    <string name="location">Ubicación: este permiso es necesario para que podamos enviar su ubicación a su contacto cuando envíe su mensaje.</string>
+    <string name="contacts">
+Contactos: Necesitamos permiso para leer sus contactos para que pueda elegir a qué contactos contactar en caso de una emergencia.</string>
+    <string name="sms">
+Mensajes de texto (sms): Necesitamos este permiso para poder enviar un mensaje de texto a sus contactos en caso de una emergencia.</string>
+    <string name="call">Llamada: También necesitamos permiso para que pueda hacer una llamada telefónica en caso de una emergencia..</string>
+    <string name="permissionAbout">Estos son los permisos que nuestra aplicación requiere.</string>
+    <string name="selectContacts">Haga clic en la flecha hacia adelante para otorgar acceso a los permisos y seleccione sus contactos para enviar el mensaje.</string>
 
     <!-- Settings view layout -->
-    <string name="message_title">Message</string>
-    <string name="default_message">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</string>
-    <string name="edit_button">EDIT</string>
+    <string name="message_title">Mensaje</string>
+    <string name="default_message">
+        Le estoy enviando este mensaje porque estoy a punto de tener una interacción con la Policía o ICE.
+        \nSi no escuchas de mí dentro de dos horas, me han detenido.
+        \nPor favor, póngase en contacto con un abogado.
+    </string>
+    <string name="edit_button">EDITAR</string>
     <string name="input_message">Enter new message</string>
-    <string name="contacts_title">Contacts</string>
-    <string name="remove_button">REMOVE</string>
-    <string name="add_button">ADD</string>
+    <string name="contacts_title">Contactos</string>
+    <string name="remove_button">RETIRAR</string>
+    <string name="add_button">AÑADIR</string>
 
     <!-- Rights view layout -->
     <array name="your_rights">
-        <item>First</item>
-        <item>Second</item>
-        <item>Third</item>
-        <item>Fourth</item>
-        <item>Fifth</item>
-        <item>Sixth</item>
+        <item>Mantenga La Calma</item>
+        <item>Tenemos Derechos</item>
+        <item>Si ya esta detenido</item>
     </array>
     <array name="description">
-        <item>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</item>
-        <item>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</item>
-        <item>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</item>
-        <item>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</item>
-        <item>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</item>
-        <item>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</item>
+        <item>
+            \nNO ABRA LA PUERTA a ningun agente de inmigracion.
+            \n\nNO DIGA NADA al agente de inmigracion. Mantega silencio.
+            \n\nNO CORRA, llame a su abogado, familia y consulado.\n
+        </item>
+        <item>
+            \nNO MIENTAS, solo diga \"No voy hablar.\" o \"Mi Abogado me dijo que no hablara\"
+            \n\nNUNCA digas a que no estas aqui legalmente
+            \n\nNUNCA digas de que pais eres.\n
+        </item>
+        <item>
+            \nPida hablar con un abogado. Pida un interprete si no entiende.
+            \n\nTiene derecho a hacer arreglos para el cuidado de sus hijos.\n
+        </item>
     </array>
 </resources>

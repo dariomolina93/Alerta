@@ -55,6 +55,7 @@ public class Settings extends Fragment implements View.OnClickListener {
     private View view;
     private View inputLayout;
     private ContactNamesAdapter contactsAdapter;
+    private String tabName = "Ajustes";
 
     private ArrayList<Contact> removeContacts;
     private ArrayList<Contact> contacts;
@@ -292,5 +293,9 @@ public class Settings extends Fragment implements View.OnClickListener {
         super.onDestroy();
         this.dbW.close();
         this.dbR.close();
+    }
+
+    public String getTabName() {
+        return tabName;
     }
 }

@@ -49,6 +49,8 @@ public class Home extends Fragment{
     private Cursor selectedContactsCursor;
     private Location location;
 
+    public final String tabName = "Inicio";
+
     @SuppressLint("MissingPermission")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -187,5 +189,9 @@ public class Home extends Fragment{
             dbR.close();
             selectedContactsCursor.close();
         }
+    }
+
+    public String getTabName() {
+        return tabName;
     }
 }
