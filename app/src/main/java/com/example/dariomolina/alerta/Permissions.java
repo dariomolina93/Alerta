@@ -150,7 +150,7 @@ public class Permissions extends Fragment{
                                         || shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
                                         || shouldShowRequestPermissionRationale(Manifest.permission.INTERNET)) {
                                     Log.d("RequestPermissionResult", "Displaying alert dialog for requesting about_permissions.");
-                                    showDialogOK("Permiso para leer contactos y mandar mensages son necesarios para utilizar la aplicacion.",
+                                    showDialogOK("Permiso para hacer llamadas, leer contactos, obtener su ubicacion y mandar mensages son necesarios para utilizar la aplicacion.",
                                             new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
@@ -180,7 +180,7 @@ public class Permissions extends Fragment{
                                         || ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.ACCESS_FINE_LOCATION)
                                         || ActivityCompat.shouldShowRequestPermissionRationale(activity,Manifest.permission.INTERNET)) {
                                     Log.d("RequestPermissionResult", "Displaying alert dialog for requesting about_permissions.");
-                                    showDialogOK("Permiso para leer contactos y mandar mensages son necesarios para utilizar la aplicacion.",
+                                    showDialogOK("Permiso para hacer llamadas, leer contactos, obtener su ubicacion y mandar mensages son necesarios para utilizar la aplicacion.",
                                             new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {

@@ -12,6 +12,7 @@ import com.example.dariomolina.alerta.Fragments.Settings;
 public class PageAdapter extends FragmentStatePagerAdapter {
 
     private Fragment[] childFragments;
+    private String tabTitles[] = new String[]{"Derechos", "Inicio", "Ajustes"};
     public PageAdapter(FragmentManager fm) {
         super(fm);
         childFragments = new Fragment[] {
@@ -35,7 +36,6 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        String title = getItem(position).getClass().getName();
-        return title.subSequence(title.lastIndexOf(".") + 1, title.length());
+        return tabTitles[position];
     }
 }

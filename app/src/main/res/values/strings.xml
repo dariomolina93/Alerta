@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Alerta</string>
     <string name="about"></string>
-    <string name="Permission">Permiso</string>
+    <string name="Permission">Permisos</string>
     <string name="location">Ubicación: este permiso es necesario para que podamos enviar su ubicación a su contacto cuando envíe su mensaje.</string>
     <string name="contacts">
 Contactos: Necesitamos permiso para leer sus contactos para que pueda elegir a qué contactos contactar en caso de una emergencia.</string>
@@ -18,32 +18,48 @@ Mensajes de texto (sms): Necesitamos este permiso para poder enviar un mensaje d
         \nSi no escuchas de mí dentro de dos horas, me han detenido.
         \nPor favor, póngase en contacto con un abogado.
     </string>
-    <string name="edit_button">EDITAR</string>
-    <string name="input_message">Enter new message</string>
+    <string name="edit_button">Editar</string>
+    <string name="input_message">Editar mensaje de ayuda</string>
     <string name="contacts_title">Contactos</string>
-    <string name="remove_button">RETIRAR</string>
-    <string name="add_button">AÑADIR</string>
+    <string name="remove_button">Retirar</string>
+    <string name="add_button">Añadir</string>
 
     <!-- Rights view layout -->
     <array name="your_rights">
-        <item>Mantenga La Calma</item>
-        <item>Tenemos Derechos</item>
-        <item>Si ya esta detenido</item>
+        <item>Tiene el derecho de mantener silencio</item>
+        <item>Tiene el derecho de hablar con un abogado</item>
+        <item>Tiene el derecho de grabar su encuentro con cualquier agente de ICE o Policia</item>
+        <item>Pueden agentes de ICE o Policia entrar en mi hogar?</item>
+        <item>Que hago si agentes de ICE of Policia avecinan en publico?</item>
+        <item>Que pasa si ICE o Policia empiezan a esculcar sus bolsillos o pertenencias?</item>
+        <item>Mas Informaction</item>
     </array>
     <array name="description">
         <item>
-            \nNO ABRA LA PUERTA a ningun agente de inmigracion.
-            \n\nNO DIGA NADA al agente de inmigracion. Mantega silencio.
-            \n\nNO CORRA, llame a su abogado, familia y consulado.\n
+            Bajo la quinta enmienda de la Constitucion de los Estados Unidos, individuos pueden mantener silencio de no dar testimonio
+            que los pueda enculpar de algun crimen o delito.  Ningun agente de ICE, policia, o cualquier otro agente del sistema judicial puede hacer que usted hable si no es su voluntad.
         </item>
         <item>
-            \nNO MIENTAS, solo diga \"No voy hablar.\" o \"Mi Abogado me dijo que no hablara\"
-            \n\nNUNCA digas a que no estas aqui legalmente
-            \n\nNUNCA digas de que pais eres.\n
+            Bajo la sexta enmienda de la Constitucion de los Estados Unidos, le da el derecho a un abogado si una persona a sido arrestada.
         </item>
         <item>
-            \nPida hablar con un abogado. Pida un interprete si no entiende.
-            \n\nTiene derecho a hacer arreglos para el cuidado de sus hijos.\n
+            Bajo la primer enmienda de la Constitucion de los Estados Unidos, usted tiene el derecho de grabar a los agentes de ICE o Policia.  Mientras no grabe a agentes de ICE o Policia en secreto, no hay ningun problema.
+        </item>
+        <item>
+            Si agentes de ICE o Policia no tienen una orden firmada por un juez, no pueden entrar en tu hogar sin permiso de un adulto.  Antes de abrir la puerta, pida que le demuestren la orden firmada por el juez por debajo de su puerta.
+            Si no tienen ninguna orden solo diga, \"No quiero hablar con ustedes, por mi seguridad porfavor dejen su informacion.\"  No mienta ni de documentos falsos, asi
+            como tampoco corra ni resista si hay arresto.
+        </item>
+        <item>
+            No responda ninguna pregunta, solo diga, \"Me puedo retirar?\" Si responden SI, conteste \"No quiero responder ninguna otra pregunta.\"  Si responden NO, solo diga,
+            \"Quiero ejercir mi derecho de mantener silencio.  Solo voy a hablar con mi abogado.\"
+        </item>
+        <item>
+            Simplemente diga a los agentes, \"Yo no doy concentimiento a que busquen en mis bolsillos o pertenencias\".
+        </item>
+        <item>
+            Recuerde, el conocimiento es poder. Su mejor defensa es estar informado.  Hoy en dia es toda la informacion esta en la palma de su mano por medio de su telefono. Busque cualquier pregunta que usted tenga e informece.  Asuma la peor circumstancia y estece preparado por si llega a
+            suceder.  Grabe cualquier encuentro que tenga usted con agentes de ICE o Policia.  Los derechos en esta applicacion an sido obtenidos por medio de Center for Constitutional Rights.
         </item>
     </array>
 </resources>

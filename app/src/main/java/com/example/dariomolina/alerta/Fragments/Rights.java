@@ -9,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -17,6 +19,7 @@ import com.example.dariomolina.alerta.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import android.widget.RelativeLayout.LayoutParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,12 +78,19 @@ public class Rights extends Fragment {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
+
                 TextView text1 = view.findViewById(android.R.id.text1);
+                text1.setTextSize(20);
                 TextView text2 = view.findViewById(android.R.id.text2);
+
 
                 text1.setText(rights[position]);
                 text2.setText(description[position]);
                 text2.setVisibility(View.GONE);
+
+                final LayoutParams layoutparams = (RelativeLayout.LayoutParams)text2.getLayoutParams();
+                layoutparams.setMargins(0,10,0,0);
+                text2.setLayoutParams(layoutparams);
                 return view;
             }
         };
