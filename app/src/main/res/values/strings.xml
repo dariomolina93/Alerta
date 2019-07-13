@@ -14,9 +14,7 @@ Mensajes de texto (sms): Necesitamos este permiso para poder enviar un mensaje d
     <!-- Settings view layout -->
     <string name="message_title">Mensaje</string>
     <string name="default_message">
-        Le estoy enviando este mensaje porque estoy a punto de tener una interacción con la Policía o ICE.
-        \nSi no escuchas de mí dentro de dos horas, me han detenido.
-        \nPor favor, póngase en contacto con un abogado.
+       Necesito tu ayuda, porfavor ven de inmediato!
     </string>
     <string name="edit_button">Editar</string>
     <string name="input_message">Editar mensaje de ayuda</string>
