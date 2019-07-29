@@ -7,11 +7,11 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.provider.ContactsContract;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,6 +21,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import dm.release.dariomolina.alerta.AlertaDatabaseHelper;
 import dm.release.dariomolina.alerta.Contact;
@@ -29,6 +30,10 @@ import dm.release.dariomolina.alerta.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,13 +41,15 @@ import java.util.HashMap;
 import static android.app.Activity.RESULT_OK;
 import static dm.release.dariomolina.alerta.AboutPermission.REQUEST_CODE_PICK_CONTACT;
 
-public class Settings extends Fragment implements View.OnClickListener {
+public class Settings extends Fragment implements View.OnClickListener, RewardedVideoAdListener {
 
     private AdView mAdView;
     private TextInputEditText inputMessage;
     private Button editButton;
     private Button removeButton;
     private Button addButton;
+    private Button addVideoButton;
+    private RewardedVideoAd mRewardedVideoAd;
     private SQLiteDatabase dbW;
     private SQLiteDatabase dbR;
     private View view;
@@ -58,10 +65,6 @@ public class Settings extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.settings, container, false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            MobileAds.initialize(getContext(), "ca-app-pub-3940256099942544~3347511713");
-        }
-
         SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(getContext());
         try{
             this.dbR = alertaDB.getReadableDatabase();
@@ -75,11 +78,15 @@ public class Settings extends Fragment implements View.OnClickListener {
             Log.i("Database", "Failed to get writable database");
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            MobileAds.initialize(getContext(), "ca-app-pub-4491011983892764~9524664327");
+        }
 
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getActivity());
+        mRewardedVideoAd.setRewardedVideoAdListener(this);
 
-        mAdView = view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
+                new AdRequest.Builder().build());
 
         //Attaching the listener to the buttons
         editButton = view.findViewById(R.id.edit_button);
@@ -88,6 +95,8 @@ public class Settings extends Fragment implements View.OnClickListener {
         removeButton.setOnClickListener(this);
         addButton = view.findViewById(R.id.add_button);
         addButton.setOnClickListener(this);
+        addVideoButton = view.findViewById(R.id.adVideoButton);
+        addVideoButton.setOnClickListener(this);
 
         inputLayout = view.findViewById(R.id.input_message_layout);
         inputMessage = view.findViewById(R.id.input_message);
@@ -120,6 +129,17 @@ public class Settings extends Fragment implements View.OnClickListener {
                 break;
             case R.id.add_button:
                 this.onClickAdd();
+                break;
+            case R.id.adVideoButton:
+                if (mRewardedVideoAd.isLoaded()) {
+                    mRewardedVideoAd.show();
+                } else {
+                    Log.d("TAG", "The video wasn't loaded yet.");
+                    mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
+                            new AdRequest.Builder().build());
+
+                    Toast.makeText(getActivity(), "Video se esta cargando, porfavor intente de nuevo", Toast.LENGTH_LONG).show();
+                }
                 break;
         }
     }
@@ -283,12 +303,66 @@ public class Settings extends Fragment implements View.OnClickListener {
 
     @Override
     public void onDestroy() {
+        mRewardedVideoAd.destroy(getActivity());
         super.onDestroy();
         this.dbW.close();
         this.dbR.close();
     }
 
+    @Override
+    public void onResume() {
+        mRewardedVideoAd.resume(getActivity());
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mRewardedVideoAd.pause(getActivity());
+        super.onPause();
+    }
+
     public String getTabName() {
         return tabName;
+    }
+
+    @Override
+    public void onRewardedVideoAdLoaded() {
+        //NOthing
+    }
+
+    @Override
+    public void onRewardedVideoAdOpened() {
+        //NOthing
+    }
+
+    @Override
+    public void onRewardedVideoStarted() {
+        //NOthing
+    }
+
+    @Override
+    public void onRewardedVideoAdClosed() {
+        mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
+                new AdRequest.Builder().build());
+    }
+
+    @Override
+    public void onRewarded(RewardItem rewardItem) {
+        //NOthing
+    }
+
+    @Override
+    public void onRewardedVideoAdLeftApplication() {
+        //NOthing
+    }
+
+    @Override
+    public void onRewardedVideoAdFailedToLoad(int i) {
+        //NOthing
+    }
+
+    @Override
+    public void onRewardedVideoCompleted() {
+        Toast.makeText(getActivity(), "Muchas Gracias!", Toast.LENGTH_LONG).show();
     }
 }

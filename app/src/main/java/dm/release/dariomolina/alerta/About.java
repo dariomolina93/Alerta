@@ -3,11 +3,9 @@ package dm.release.dariomolina.alerta;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import dm.release.dariomolina.alerta.R;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class About extends AppCompatActivity {
 

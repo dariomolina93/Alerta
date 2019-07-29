@@ -1,7 +1,8 @@
 package dm.release.dariomolina.alerta.Fragments;
 
 import android.os.Build;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,10 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import dm.release.dariomolina.alerta.R;
@@ -22,9 +21,7 @@ import com.google.android.gms.ads.MobileAds;
 import android.widget.RelativeLayout.LayoutParams;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class Rights extends Fragment {
@@ -44,8 +41,9 @@ public class Rights extends Fragment {
         setupListView(view);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            MobileAds.initialize(getContext(), "ca-app-pub-3940256099942544~3347511713");
+            MobileAds.initialize(getContext(), "ca-app-pub-4491011983892764~9524664327");
         }
+
         mAdView = view.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
@@ -82,7 +80,6 @@ public class Rights extends Fragment {
                 TextView text1 = view.findViewById(android.R.id.text1);
                 text1.setTextSize(20);
                 TextView text2 = view.findViewById(android.R.id.text2);
-
 
                 text1.setText(rights[position]);
                 text2.setText(description[position]);

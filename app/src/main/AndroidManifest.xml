@@ -3,7 +3,6 @@
     package="dm.release.dariomolina.alerta">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -18,8 +17,11 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-4491011983892764~9524664327"/>
+
         <activity android:name="dm.release.dariomolina.alerta.MainActivity"
-                  android:windowSoftInputMode="adjustPan">
+                  android:windowSoftInputMode="adjustPan"
+                  android:configChanges="orientation"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -27,7 +29,9 @@
         </activity>
 
         <activity android:name="dm.release.dariomolina.alerta.About"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -35,7 +39,9 @@
 
         </activity>
 
-        <activity android:name="dm.release.dariomolina.alerta.AboutPermission">
+        <activity android:name="dm.release.dariomolina.alerta.AboutPermission"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

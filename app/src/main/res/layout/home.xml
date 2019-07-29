@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/notify_final"
         android:gravity="center"
-        android:text="                  Notificar"
+        android:text="             Avisar"
         android:textColor="@color/colorPrimary"
         android:textSize="42dp"
         app:layout_constraintBottom_toTopOf="@+id/call"
@@ -38,7 +38,7 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/call_final"
         android:gravity="center"
-        android:text="           Llamar"
+        android:text="            Llamar"
         android:textColor="@color/colorPrimary"
         android:textSize="42dp"
         app:layout_constraintBottom_toTopOf="@+id/adView"
@@ -52,22 +52,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="ca-app-pub-4491011983892764/3711609602"
+        ads:adUnitId="ca-app-pub-4491011983892764/8177361044"
         ads:layout_constraintBottom_toBottomOf="parent"
         ads:layout_constraintEnd_toEndOf="parent"
         ads:layout_constraintStart_toStartOf="parent"></com.google.android.gms.ads.AdView>
 
-    <android.support.constraint.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="20dp" />
+        app:layout_constraintGuide_begin="20dp"/>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

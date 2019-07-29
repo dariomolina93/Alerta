@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,23 +17,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+
 import dm.release.dariomolina.alerta.GPSTracker;
 import dm.release.dariomolina.alerta.Permissions;
 import dm.release.dariomolina.alerta.AlertaDatabaseHelper;
 import dm.release.dariomolina.alerta.R;
-import dm.release.dariomolina.alerta.SMS;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
-public class Home extends Fragment{
+public class Home extends Fragment {
 
     private Button notify, call;
-    private SMS message;
+    //private SMS message;
     private AdView bannerAd;
-    private InterstitialAd interstitialAd;
     private Permissions permissions;
     private GPSTracker gpsTracker;
     private SQLiteDatabase dbR;
@@ -43,6 +41,7 @@ public class Home extends Fragment{
     private Location location;
 
     public final String tabName = "Inicio";
+    static final int SMS_REQUEST = 1;  // The request code
 
     @SuppressLint("MissingPermission")
     @Override
@@ -54,8 +53,8 @@ public class Home extends Fragment{
         super.onCreateView(inflater, container, savedInstanceState);
         permissions = new Permissions();
         permissions.setActivity(getActivity());
-        message = new SMS(getActivity());
-        message.registerReceivers();
+        //message = new SMS(getActivity());
+        //message.registerReceivers();
         notify = view.findViewById(R.id.notify);
         call = view.findViewById(R.id.call);
         gpsTracker = new GPSTracker(getContext());
@@ -67,10 +66,6 @@ public class Home extends Fragment{
 
         bannerAd = view.findViewById(R.id.adView);
         bannerAd.loadAd(new AdRequest.Builder().build());
-
-        interstitialAd = new InterstitialAd(getActivity());
-        interstitialAd.setAdUnitId("ca-app-pub-4491011983892764/2611179020");
-        interstitialAd.loadAd(new AdRequest.Builder().build());
       
        // Reading the database
        alertadbR = new AlertaDatabaseHelper(getContext());
@@ -84,8 +79,7 @@ public class Home extends Fragment{
             @Override
             public void onClick(View v){
                 permissions.checkAndRequestPermissions();
-                if(permissions.areAllPermissionsGranted()) sendTextMessage();
-                interstitialAd.loadAd(new AdRequest.Builder().build());
+                if(permissions.areAllPermissionsGranted()){ sendTextMessage();}
             }
         });
 
@@ -120,37 +114,31 @@ public class Home extends Fragment{
           } else {
               sms = msg;
           }
-          sms += "\n\n" + "Direccion donde se encuentra su contacto: http://maps.google.com/?q=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude();
+          sms += "\n\n" + "Direccion donde se encuentra su contacto: http://maps.google.com/?q=" + gpsTracker.getLatitude()+","+ gpsTracker.getLongitude() + "\n\n";
 
         Log.d("notifyEvent", "Sending Text Message");
 
         // Index represents the column returned from the specified query call above. Ex name = 0, phone = 1
-        int i = 0;
+        int j = 0;
+          String numbers = "";
         while(selectedContactsCursor.moveToNext()){
             String name = selectedContactsCursor.getString(0);
             String phoneNumber = selectedContactsCursor.getString(1);
-            message.sendSMS(phoneNumber, sms, name, i);
 
-            ///***********************************
-//            Intent intent = new Intent(Intent.ACTION_SENDTO);
-//            intent.setData(Uri.parse("smsto:" + phoneNumber));  // This ensures only SMS apps respond
-//            intent.putExtra("sms_body", sms);
-//            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-//                startActivity(intent);
-//            }
-            //*******************************
-            i++;
-        }
-        if(i != 0) {
-            if (interstitialAd.isLoaded()) {
-                interstitialAd.show();
-            } else {
-                Log.d("TAG", "The interstitial wasn't loaded yet.");
-            }
+            numbers += phoneNumber + ';';
+
+            j++;
         }
 
-        else {
+        if(j == 0) {
             Toast.makeText(getActivity(),"Porfavor seleccione contactos para mandar mensaje de texto.", Toast.LENGTH_LONG).show();
+        } else{
+            numbers = numbers.substring(0,numbers.length() - 1);
+
+            Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
+            sendIntent.setData(Uri.parse("sms:" + numbers));
+            sendIntent.putExtra("sms_body", sms);
+            startActivityForResult(sendIntent, SMS_REQUEST);
         }
 
       }catch (SQLiteException e) {
@@ -158,6 +146,13 @@ public class Home extends Fragment{
       }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == SMS_REQUEST) {
+            //be default the resultcode is returning as result_cancelled
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult ( int requestCode, String permissions[], int[] grantResults) {
@@ -169,7 +164,6 @@ public class Home extends Fragment{
 
     @Override
     public void onResume() {
-        interstitialAd.loadAd(new AdRequest.Builder().build());
         super.onResume();
         location = gpsTracker.getLocation();
     }
@@ -183,7 +177,7 @@ public class Home extends Fragment{
     @Override
     public void onDestroy()
     {
-        message.unRegisterReceivers();
+        //message.unRegisterReceivers();
         super.onDestroy();
         gpsTracker.stopUsingGPS();
 
