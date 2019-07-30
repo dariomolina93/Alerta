@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Alerta</string>
+    <string name="app_name">Alerta!</string>
     <string name="about"></string>
     <string name="Permission">Permisos</string>
     <string name="location">Ubicación: este permiso es necesario para que podamos enviar su ubicación a su contacto cuando envíe su mensaje.</string>
