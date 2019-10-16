@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,16 +22,16 @@ import dm.android.content.alerta.GPSTracker;
 import dm.android.content.alerta.Permissions;
 import dm.android.content.alerta.AlertaDatabaseHelper;
 import dm.android.content.alerta.R;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
+import com.mopub.common.SdkInitializationListener;
+import com.mopub.common.logging.MoPubLog;
+import com.mopub.mobileads.MoPubView;
 
 public class Home extends Fragment {
 
     private Button notify, call;
-    //private SMS message;
-    private AdView bannerAd;
+    private MoPubView moPubView;
     private Permissions permissions;
     private GPSTracker gpsTracker;
     private SQLiteDatabase dbR;
@@ -60,13 +59,16 @@ public class Home extends Fragment {
         gpsTracker = new GPSTracker(getContext());
         location = gpsTracker.getLocation();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            MobileAds.initialize(getContext(), "ca-app-pub-4491011983892764~9524664327");
-        }
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("252412d5e9364a05ab77d9396346d73d")
+                .withLogLevel(MoPubLog.LogLevel.DEBUG)
+                .withLegitimateInterestAllowed(false)
+                .build();
 
-        bannerAd = view.findViewById(R.id.adView);
-        bannerAd.loadAd(new AdRequest.Builder().build());
-      
+        MoPub.initializeSdk(getContext(), sdkConfiguration, initSdkListener());
+
+        moPubView = (MoPubView) view.findViewById(R.id.adView);
+        moPubView.setAdUnitId("252412d5e9364a05ab77d9396346d73d"); // Enter your Ad Unit ID from www.mopub.com
+
        // Reading the database
        alertadbR = new AlertaDatabaseHelper(getContext());
        try{
@@ -95,6 +97,18 @@ public class Home extends Fragment {
         });
 
         return view;
+    }
+
+    private SdkInitializationListener initSdkListener() {
+        return new SdkInitializationListener() {
+            @Override
+            public void onInitializationFinished() {
+           /* MoPub SDK initialized.
+           Check if you should show the consent dialog here, and make your ad requests. */
+
+                moPubView.loadAd();
+            }
+        };
     }
 
     public void sendTextMessage(){

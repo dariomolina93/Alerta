@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 import android.provider.ContactsContract;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -27,29 +26,33 @@ import dm.android.content.alerta.AlertaDatabaseHelper;
 import dm.android.content.alerta.Contact;
 import dm.android.content.alerta.ContactNamesAdapter;
 import dm.android.content.alerta.R;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.reward.RewardItem;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
+//import com.google.android.gms.ads.AdView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.mopub.common.MoPub;
+import com.mopub.common.MoPubReward;
+import com.mopub.common.SdkConfiguration;
+import com.mopub.common.SdkInitializationListener;
+import com.mopub.common.logging.MoPubLog;
+import com.mopub.mobileads.MoPubErrorCode;
+import com.mopub.mobileads.MoPubRewardedVideoListener;
+import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 import static dm.android.content.alerta.AboutPermission.REQUEST_CODE_PICK_CONTACT;
 
-public class Settings extends Fragment implements View.OnClickListener, RewardedVideoAdListener {
-
-    private AdView mAdView;
+//public class Settings extends Fragment implements View.OnClickListener, RewardedVideoAdListener {
+public class Settings extends Fragment implements View.OnClickListener, MoPubRewardedVideoListener {
+    //private AdView mAdView;
+    private MoPubRewardedVideoListener rewardedVideoListener;
     private TextInputEditText inputMessage;
     private Button editButton;
     private Button removeButton;
     private Button addButton;
     private Button addVideoButton;
-    private RewardedVideoAd mRewardedVideoAd;
     private SQLiteDatabase dbW;
     private SQLiteDatabase dbR;
     private View view;
@@ -64,6 +67,7 @@ public class Settings extends Fragment implements View.OnClickListener, Rewarded
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.settings, container, false);
+        MoPub.onCreate(getActivity());
 
         SQLiteOpenHelper alertaDB = new AlertaDatabaseHelper(getContext());
         try{
@@ -78,15 +82,12 @@ public class Settings extends Fragment implements View.OnClickListener, Rewarded
             Log.i("Database", "Failed to get writable database");
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            MobileAds.initialize(getContext(), "ca-app-pub-4491011983892764~9524664327");
-        }
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("920b6145fb1546cf8b5cf2ac34638bb7")
+                .withLogLevel(MoPubLog.LogLevel.DEBUG)
+                .withLegitimateInterestAllowed(false)
+                .build();
 
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getActivity());
-        mRewardedVideoAd.setRewardedVideoAdListener(this);
-
-        mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
-                new AdRequest.Builder().build());
+        MoPub.initializeSdk(getContext(), sdkConfiguration, initSdkListener());
 
         //Attaching the listener to the buttons
         editButton = view.findViewById(R.id.edit_button);
@@ -115,6 +116,7 @@ public class Settings extends Fragment implements View.OnClickListener, Rewarded
                 return false;
             }
         });
+
         return view;
     }
 
@@ -131,17 +133,37 @@ public class Settings extends Fragment implements View.OnClickListener, Rewarded
                 this.onClickAdd();
                 break;
             case R.id.adVideoButton:
-                if (mRewardedVideoAd.isLoaded()) {
-                    mRewardedVideoAd.show();
+                if (MoPubRewardedVideos.hasRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7")) {
+                    MoPubRewardedVideos.showRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7");
                 } else {
                     Log.d("TAG", "The video wasn't loaded yet.");
-                    mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
-                            new AdRequest.Builder().build());
+                    MoPubRewardedVideos.loadRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7");
 
                     Toast.makeText(getActivity(), "Video se esta cargando, porfavor intente de nuevo", Toast.LENGTH_LONG).show();
                 }
+//                if (mRewardedVideoAd.isLoaded()) {
+//                    mRewardedVideoAd.show();
+//                } else {
+//                    Log.d("TAG", "The video wasn't loaded yet.");
+//                    mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
+//                            new AdRequest.Builder().build());
+//
+//                    Toast.makeText(getActivity(), "Video se esta cargando, porfavor intente de nuevo", Toast.LENGTH_LONG).show();
+//                }
                 break;
         }
+    }
+
+    private SdkInitializationListener initSdkListener() {
+        return new SdkInitializationListener() {
+            @Override
+            public void onInitializationFinished() {
+           /* MoPub SDK initialized.
+           Check if you should show the consent dialog here, and make your ad requests. */
+
+                MoPubRewardedVideos.loadRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7");
+            }
+        };
     }
 
     private void onClickAdd() {
@@ -303,7 +325,7 @@ public class Settings extends Fragment implements View.OnClickListener, Rewarded
 
     @Override
     public void onDestroy() {
-        mRewardedVideoAd.destroy(getActivity());
+        MoPub.onDestroy(getActivity());
         super.onDestroy();
         this.dbW.close();
         this.dbR.close();
@@ -311,14 +333,21 @@ public class Settings extends Fragment implements View.OnClickListener, Rewarded
 
     @Override
     public void onResume() {
-        mRewardedVideoAd.resume(getActivity());
+        MoPub.onResume(getActivity());
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        mRewardedVideoAd.pause(getActivity());
+        MoPub.onPause(getActivity());
+        //mRewardedVideoAd.pause(getActivity());
         super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        MoPub.onStop(getActivity());
     }
 
     public String getTabName() {
@@ -326,43 +355,39 @@ public class Settings extends Fragment implements View.OnClickListener, Rewarded
     }
 
     @Override
-    public void onRewardedVideoAdLoaded() {
-        //NOthing
+    public void onRewardedVideoLoadSuccess(String adUnitId) {
+                // Called when the video for the given adUnitId has loaded. At this point you should be able to call MoPubRewardedVideos.showRewardedVideo(String) to show the video.
+        MoPubRewardedVideos.showRewardedVideo(adUnitId);
+    }
+    @Override
+    public void onRewardedVideoLoadFailure(String adUnitId, MoPubErrorCode errorCode) {
+        // Called when a video fails to load for the given adUnitId. The provided error code will provide more insight into the reason for the failure to load.
     }
 
     @Override
-    public void onRewardedVideoAdOpened() {
-        //NOthing
+    public void onRewardedVideoStarted(String adUnitId) {
+        // Called when a rewarded video starts playing.
     }
 
     @Override
-    public void onRewardedVideoStarted() {
-        //NOthing
+    public void onRewardedVideoPlaybackError(String adUnitId, MoPubErrorCode errorCode) {
+        //  Called when there is an error during video playback.
     }
 
     @Override
-    public void onRewardedVideoAdClosed() {
-        mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
-                new AdRequest.Builder().build());
+    public void onRewardedVideoClicked(String adUnitId) {
+        //  Called when a rewarded video is clicked.
     }
 
     @Override
-    public void onRewarded(RewardItem rewardItem) {
-        //NOthing
+    public void onRewardedVideoClosed(String adUnitId) {
+        // Called when a rewarded video is closed. At this point your application should resume.
+        MoPubRewardedVideos.loadRewardedVideo(adUnitId);
     }
 
     @Override
-    public void onRewardedVideoAdLeftApplication() {
-        //NOthing
-    }
-
-    @Override
-    public void onRewardedVideoAdFailedToLoad(int i) {
-        //NOthing
-    }
-
-    @Override
-    public void onRewardedVideoCompleted() {
-        Toast.makeText(getActivity(), "Muchas Gracias!", Toast.LENGTH_LONG).show();
+    public void onRewardedVideoCompleted(Set<String> adUnitIds, MoPubReward reward) {
+        // Called when a rewarded video is completed and the user should be rewarded.
+        // You can query the reward object with boolean isSuccessful(), String getLabel(), and int getAmount().
     }
 }

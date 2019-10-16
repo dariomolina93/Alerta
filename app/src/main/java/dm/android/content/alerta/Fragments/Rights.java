@@ -1,6 +1,5 @@
 package dm.android.content.alerta.Fragments;
 
-import android.os.Build;
 import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
@@ -15,9 +14,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import dm.android.content.alerta.R;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
+import com.mopub.common.SdkInitializationListener;
+import com.mopub.common.logging.MoPubLog;
+import com.mopub.mobileads.MoPubView;
+
 import android.widget.RelativeLayout.LayoutParams;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ import java.util.List;
 
 public class Rights extends Fragment {
 
-    private AdView mAdView;
+    private MoPubView moPubView;
     private String[] rights;
     private String[] description;
     private String tabName = "Derechos";
@@ -40,15 +42,29 @@ public class Rights extends Fragment {
         this.description = getActivity().getResources().getStringArray(R.array.description);
         setupListView(view);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            MobileAds.initialize(getContext(), "ca-app-pub-4491011983892764~9524664327");
-        }
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("b195f8dd8ded45fe847ad89ed1d016da")
+                .withLogLevel(MoPubLog.LogLevel.DEBUG)
+                .withLegitimateInterestAllowed(false)
+                .build();
 
-        mAdView = view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        MoPub.initializeSdk(getContext(), sdkConfiguration, initSdkListener());
+
+        moPubView = (MoPubView) view.findViewById(R.id.adView);
+        moPubView.setAdUnitId("b195f8dd8ded45fe847ad89ed1d016da"); // Enter your Ad Unit ID from www.mopub.com
 
         return view;
+    }
+
+    private SdkInitializationListener initSdkListener() {
+        return new SdkInitializationListener() {
+            @Override
+            public void onInitializationFinished() {
+           /* MoPub SDK initialized.
+           Check if you should show the consent dialog here, and make your ad requests. */
+
+                moPubView.loadAd();
+            }
+        };
     }
 
     public void addData(List<List<String>> list) {
