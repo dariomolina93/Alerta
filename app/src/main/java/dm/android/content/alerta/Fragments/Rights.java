@@ -32,6 +32,7 @@ public class Rights extends Fragment {
     private String[] rights;
     private String[] description;
     private String tabName = "Derechos";
+    private final String adUnitId ="acf870e6bfa94c94bb9d403de28f7ed7";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,7 +43,7 @@ public class Rights extends Fragment {
         this.description = getActivity().getResources().getStringArray(R.array.description);
         setupListView(view);
 
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("b195f8dd8ded45fe847ad89ed1d016da")
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(adUnitId)
                 .withLogLevel(MoPubLog.LogLevel.DEBUG)
                 .withLegitimateInterestAllowed(false)
                 .build();
@@ -50,7 +51,7 @@ public class Rights extends Fragment {
         MoPub.initializeSdk(getContext(), sdkConfiguration, initSdkListener());
 
         moPubView = (MoPubView) view.findViewById(R.id.adView);
-        moPubView.setAdUnitId("b195f8dd8ded45fe847ad89ed1d016da"); // Enter your Ad Unit ID from www.mopub.com
+        moPubView.setAdUnitId(adUnitId); // Enter your Ad Unit ID from www.mopub.com
 
         return view;
     }

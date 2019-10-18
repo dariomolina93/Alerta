@@ -19,8 +19,8 @@ Mensajes de texto (sms): Necesitamos este permiso para poder enviar un mensaje d
     <string name="videoAddAbout">
        Si gusta contribuir con el desarollo de Alerta!, porfavor presione el siguiente boton para ver un corto video de 15 a 30 segundos.  Es totalmente gratis!</string>
     <string name="edit_button">Editar</string>
-    <string name="input_message">Editar mensaje de ayuda</string>
-    <string name="contacts_title">Contactos</string>
+    <string name="input_message">Editar Mensaje de Emergencia</string>
+    <string name="contacts_title">Contactos De Emergencia</string>
     <string name="remove_button">Retirar</string>
     <string name="add_button">Añadir</string>
 

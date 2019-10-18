@@ -5,7 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.provider.ContactsContract;
+
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,7 +29,6 @@ import dm.android.content.alerta.AlertaDatabaseHelper;
 import dm.android.content.alerta.Contact;
 import dm.android.content.alerta.ContactNamesAdapter;
 import dm.android.content.alerta.R;
-//import com.google.android.gms.ads.AdView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
@@ -36,12 +38,11 @@ import com.mopub.common.logging.MoPubLog;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubRewardedVideoListener;
 import com.mopub.mobileads.MoPubRewardedVideos;
+import com.wafflecopter.multicontactpicker.MultiContactPicker;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
 
-import static android.app.Activity.RESULT_OK;
 import static dm.android.content.alerta.AboutPermission.REQUEST_CODE_PICK_CONTACT;
 
 //public class Settings extends Fragment implements View.OnClickListener, RewardedVideoAdListener {
@@ -59,6 +60,7 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
     private View inputLayout;
     private ContactNamesAdapter contactsAdapter;
     private String tabName = "Ajustes";
+    private final String adUnitId = "449cc3262685492dbd7ae424e7afa3e9";
 
     private ArrayList<Contact> removeContacts;
     private ArrayList<Contact> contacts;
@@ -82,7 +84,7 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
             Log.i("Database", "Failed to get writable database");
         }
 
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("920b6145fb1546cf8b5cf2ac34638bb7")
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(adUnitId)
                 .withLogLevel(MoPubLog.LogLevel.DEBUG)
                 .withLegitimateInterestAllowed(false)
                 .build();
@@ -133,23 +135,14 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
                 this.onClickAdd();
                 break;
             case R.id.adVideoButton:
-                if (MoPubRewardedVideos.hasRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7")) {
-                    MoPubRewardedVideos.showRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7");
+                if (MoPubRewardedVideos.hasRewardedVideo(adUnitId)) {
+                    MoPubRewardedVideos.showRewardedVideo(adUnitId);
                 } else {
                     Log.d("TAG", "The video wasn't loaded yet.");
-                    MoPubRewardedVideos.loadRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7");
+                    MoPubRewardedVideos.loadRewardedVideo(adUnitId);
 
                     Toast.makeText(getActivity(), "Video se esta cargando, porfavor intente de nuevo", Toast.LENGTH_LONG).show();
                 }
-//                if (mRewardedVideoAd.isLoaded()) {
-//                    mRewardedVideoAd.show();
-//                } else {
-//                    Log.d("TAG", "The video wasn't loaded yet.");
-//                    mRewardedVideoAd.loadAd("ca-app-pub-4491011983892764/5462131000",
-//                            new AdRequest.Builder().build());
-//
-//                    Toast.makeText(getActivity(), "Video se esta cargando, porfavor intente de nuevo", Toast.LENGTH_LONG).show();
-//                }
                 break;
         }
     }
@@ -160,8 +153,7 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
             public void onInitializationFinished() {
            /* MoPub SDK initialized.
            Check if you should show the consent dialog here, and make your ad requests. */
-
-                MoPubRewardedVideos.loadRewardedVideo("920b6145fb1546cf8b5cf2ac34638bb7");
+                MoPubRewardedVideos.loadRewardedVideo(adUnitId);
             }
         };
     }
@@ -244,83 +236,24 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
 
     private void selectContacts() {
         Log.i("SelectContacts", "About to select contacts");
-        Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
-        phonebookIntent.putExtra("additional", "phone-multi");
-        phonebookIntent.putExtra("FromMMS", true);
-        startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
-    }
 
-    private HashMap<String,String> getAllContacts()
-    {
-        HashMap<String,String> nameAndPhone = new HashMap<>();
-        //this will make an inner query call from android to get all contacts from user's phone
-        Cursor phones = getContext().getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
-        while (phones.moveToNext())
-        {
-            //while iterating through each contact, store name and phone
-            String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-            //string phone numbers to solely leave the digits.
-            phoneNumber =  phoneNumber.replaceAll("[^0-9]", "");
-            nameAndPhone.put(phoneNumber,name);
-        }
-        phones.close();
-        return nameAndPhone;
-    }
-
-    public void insertContact(String name, String phoneNumber) {
-        if(this.dbW == null) {
-            Log.i("insertData", "FAILED: data is null");
-            return;
-        }
-        int size = contactsAdapter.getItemCount();
-        Contact newContact = new Contact(name, phoneNumber, "0");
-        Log.i("insertData", "Name: " + name + " phoneNumber: " + phoneNumber);
-        if (!contacts.contains(newContact)) {
-            AlertaDatabaseHelper.addContactToDB(this.dbW, name, phoneNumber);
-            contacts.add(new Contact(name, phoneNumber, "0"));
-            contactsAdapter.notifyItemInserted(size);
-        }else {
-            Log.i("insertData","Duplicate contact: " + "Name: " + name + " phoneNumber: " + phoneNumber);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==RESULT_OK)
-        {
-            //if request code is the one I provided(indicates this is the result of user selecting their contacts)
-            if(requestCode == REQUEST_CODE_PICK_CONTACT)
-            {
-                Bundle bundle =  data.getExtras();
-                //this will get the contacts the user selected from android ui
-                //the selected contacts are returned in a string that consists of ('uriID;phoneNumber')
-                ArrayList<String> selectedContacts = bundle.getStringArrayList("result");
-
-                //this will get all the contacts in the user's phone
-                HashMap<String,String> allContacts = getAllContacts();
-                for(int i =0; i < selectedContacts.size(); i++)
-                {
-                    //results will contain elements[uri, phoneNumber]
-                    String[] results = selectedContacts.get(i).split(";");
-
-                    //leaving just the digits in phoneNumber  Ex. (831)444-2322 -> 8314442322
-                    String phoneNumber = results[1].replaceAll("[^0-9]", "");
-
-                    //simply get the key value from allContacts map, and store the contacts selected by the user in the sharedpreference object
-                    //and store their number and name
-                    if(allContacts.get(phoneNumber) != null) {
-                        insertContact(allContacts.get(phoneNumber), phoneNumber);
-                    }
-                }
-                //after contacts have been stored, simply send user to home screen
-//                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                startActivity(intent);
-                return;
-            }
-        }
+        new MultiContactPicker.Builder(getActivity()) //Activity/fragment context
+                .theme(R.style.AppTheme) //Optional - default: MultiContactPicker.Azure
+                .hideScrollbar(false) //Optional - default: false
+                .showTrack(true) //Optional - default: true
+                .searchIconColor(Color.BLACK) //Option - default: White
+                .setChoiceMode(MultiContactPicker.CHOICE_MODE_MULTIPLE) //Optional - default: CHOICE_MODE_MULTIPLE
+                .handleColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary)) //Optional - default: Azure Blue
+                .bubbleColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary)) //Optional - default: Azure Blue
+                .bubbleTextColor(Color.WHITE) //Optional - default: White
+                .setTitleText("Seleccione Contactos Emergencia") //Optional - default: Select Contacts
+                //.setSelectedContacts("10", "5" / myList) //Optional - will pre-select contacts of your choice. String... or List<ContactResult>
+                .setLoadingType(MultiContactPicker.LOAD_SYNC) //Optional - default LOAD_ASYNC (wait till all loaded vs stream results)
+               // .limitToColumn(LimitColumn.NONE) //Optional - default NONE (Include phone + email, limiting to one can improve loading time)
+                .setActivityAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
+                        android.R.anim.fade_in,
+                        android.R.anim.fade_out) //Optional - default: No animation overrides
+                .showPickerForResult(REQUEST_CODE_PICK_CONTACT);
     }
 
     @Override
@@ -333,6 +266,7 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
 
     @Override
     public void onResume() {
+        setContactsAdapter();
         MoPub.onResume(getActivity());
         super.onResume();
     }

@@ -38,9 +38,9 @@ public class Home extends Fragment {
     private SQLiteOpenHelper alertadbR;
     private Cursor selectedContactsCursor;
     private Location location;
-
     public final String tabName = "Inicio";
     static final int SMS_REQUEST = 1;  // The request code
+    private final String adUnitId = "1b83a09d926a4498ac9f4fa63fa13758";
 
     @SuppressLint("MissingPermission")
     @Override
@@ -59,7 +59,7 @@ public class Home extends Fragment {
         gpsTracker = new GPSTracker(getContext());
         location = gpsTracker.getLocation();
 
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder("252412d5e9364a05ab77d9396346d73d")
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(adUnitId)
                 .withLogLevel(MoPubLog.LogLevel.DEBUG)
                 .withLegitimateInterestAllowed(false)
                 .build();
@@ -67,7 +67,7 @@ public class Home extends Fragment {
         MoPub.initializeSdk(getContext(), sdkConfiguration, initSdkListener());
 
         moPubView = (MoPubView) view.findViewById(R.id.adView);
-        moPubView.setAdUnitId("252412d5e9364a05ab77d9396346d73d"); // Enter your Ad Unit ID from www.mopub.com
+        moPubView.setAdUnitId(adUnitId); // Enter your Ad Unit ID from www.mopub.com
 
        // Reading the database
        alertadbR = new AlertaDatabaseHelper(getContext());

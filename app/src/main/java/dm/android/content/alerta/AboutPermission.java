@@ -1,26 +1,22 @@
 package dm.android.content.alerta;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import dm.android.content.alerta.R;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import androidx.core.content.ContextCompat;
+import com.wafflecopter.multicontactpicker.ContactResult;
+import com.wafflecopter.multicontactpicker.MultiContactPicker;
+import java.util.List;
 
 public class AboutPermission extends AppCompatActivity {
     private Permissions permissions;
     public static final int REQUEST_CODE_PICK_CONTACT = 2;
-
     private SQLiteDatabase dbW;
 
     @Override
@@ -67,61 +63,40 @@ public class AboutPermission extends AppCompatActivity {
     }
     //this launches the android ui to select the users contacts
     private void selectContacts() {
-        Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
-        phonebookIntent.putExtra("additional", "phone-multi");
-        phonebookIntent.putExtra("FromMMS", true);
-        startActivityForResult(phonebookIntent, REQUEST_CODE_PICK_CONTACT);
+        new MultiContactPicker.Builder(this) //Activity/fragment context
+                .theme(R.style.AppTheme) //Optional - default: MultiContactPicker.Azure
+                .hideScrollbar(false) //Optional - default: false
+                .showTrack(true) //Optional - default: true
+                .searchIconColor(Color.BLACK) //Option - default: White
+                .setChoiceMode(MultiContactPicker.CHOICE_MODE_MULTIPLE) //Optional - default: CHOICE_MODE_MULTIPLE
+                .handleColor(ContextCompat.getColor(this, R.color.colorPrimary)) //Optional - default: Azure Blue
+                .bubbleColor(ContextCompat.getColor(this, R.color.colorPrimary)) //Optional - default: Azure Blue
+                .bubbleTextColor(Color.WHITE) //Optional - default: White
+                .setTitleText("Selecione Contactos Emergencia") //Optional - default: Select Contacts
+                //.setSelectedContacts("10", "5" / myList) //Optional - will pre-select contacts of your choice. String... or List<ContactResult>
+                .setLoadingType(MultiContactPicker.LOAD_SYNC) //Optional - default LOAD_ASYNC (wait till all loaded vs stream results)
+                // .limitToColumn(LimitColumn.NONE) //Optional - default NONE (Include phone + email, limiting to one can improve loading time)
+                .setActivityAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
+                        android.R.anim.fade_in,
+                        android.R.anim.fade_out) //Optional - default: No animation overrides
+                .showPickerForResult(REQUEST_CODE_PICK_CONTACT);
     }
 
-    private HashMap<String,String> getAllContacts()
-    {
-        HashMap<String,String> nameAndPhone = new HashMap<>();
-        //this will make an inner query call from android to get all contacts from user's phone
-        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
-        while (phones.moveToNext())
-        {
-            //while iterating through each contact, store name and phone
-            String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-            //string phone numbers to solely leave the digits.
-            phoneNumber =  phoneNumber.replaceAll("[^0-9]", "");
-            nameAndPhone.put(phoneNumber,name);
-        }
-        phones.close();
-        return nameAndPhone;
-    }
-
-    // Once the user finished selecting contacts, this method is called after
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==RESULT_OK)
         {
-            //if request code is the one I provided(indicates this is the result of user selecting their contacts)
-            if(requestCode == REQUEST_CODE_PICK_CONTACT)
-            {
-                Bundle bundle =  data.getExtras();
-                //this will get the contacts the user selected from android ui
-                //the selected contacts are returned in a string that consists of ('uriID;phoneNumber')
-                ArrayList<String> selectedContacts = bundle.getStringArrayList("result");
+            //this is being called when user selects to add/update their emergency contacts
+            if(requestCode == REQUEST_CODE_PICK_CONTACT) {
+                List<ContactResult> results = MultiContactPicker.obtainResult(data);
+                results.size();
 
-                //this will get all the contacts in the user's phone
-                HashMap<String,String> allContacts = getAllContacts();
-                for(int i =0; i < selectedContacts.size(); i++)
-                {
-                    //results will contain elements[uri, phoneNumber]
-                    String[] results = selectedContacts.get(i).split(";");
-
-                    //leaving just the digits in phoneNumber  Ex. (831)444-2322 -> 8314442322
-                    String phoneNumber = results[1].replaceAll("[^0-9]", "");
-
-                    //simply get the key value from allContacts map, and store the contacts selected by the user in the sharedpreference object
-                    //and store their number and name
-                    if(allContacts.get(phoneNumber) != null) {
-                        insertContact(allContacts.get(phoneNumber), phoneNumber);
-                    }
+                for(int i = 0; i < results.size(); i++){
+                    String phoneNumber = results.get(i).getPhoneNumbers().get(0).getNumber().replaceAll("[^0-9]", "");
+                    insertContact(results.get(i).getDisplayName(),phoneNumber);
                 }
-                //after contacts have been stored, simply send user to home screen
+
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 return;
