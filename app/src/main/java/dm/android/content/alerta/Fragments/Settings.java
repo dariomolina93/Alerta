@@ -46,9 +46,9 @@ import java.util.Set;
 import static dm.android.content.alerta.AboutPermission.REQUEST_CODE_PICK_CONTACT;
 
 //public class Settings extends Fragment implements View.OnClickListener, RewardedVideoAdListener {
-public class Settings extends Fragment implements View.OnClickListener, MoPubRewardedVideoListener {
+public class Settings extends Fragment implements View.OnClickListener {
     //private AdView mAdView;
-    private MoPubRewardedVideoListener rewardedVideoListener;
+
     private TextInputEditText inputMessage;
     private Button editButton;
     private Button removeButton;
@@ -61,7 +61,7 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
     private ContactNamesAdapter contactsAdapter;
     private String tabName = "Ajustes";
     private final String adUnitId = "449cc3262685492dbd7ae424e7afa3e9";
-
+    private MoPubRewardedVideoListener rewardedVideoListener;
     private ArrayList<Contact> removeContacts;
     private ArrayList<Contact> contacts;
 
@@ -90,6 +90,47 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
                 .build();
 
         MoPub.initializeSdk(getContext(), sdkConfiguration, initSdkListener());
+
+        rewardedVideoListener = new MoPubRewardedVideoListener() {
+            @Override
+            public void onRewardedVideoLoadSuccess(String adUnitId) {
+                // Called when the video for the given adUnitId has loaded. At this point you should be able to call MoPubRewardedVideos.showRewardedVideo(String) to show the video.
+            }
+            @Override
+            public void onRewardedVideoLoadFailure(String adUnitId, MoPubErrorCode errorCode) {
+                // Called when a video fails to load for the given adUnitId. The provided error code will provide more insight into the reason for the failure to load.
+            }
+
+            @Override
+            public void onRewardedVideoStarted(String adUnitId) {
+                // Called when a rewarded video starts playing.
+            }
+
+            @Override
+            public void onRewardedVideoPlaybackError(String adUnitId, MoPubErrorCode errorCode) {
+                //  Called when there is an error during video playback.
+            }
+
+            @Override
+            public void onRewardedVideoClicked(String adUnitId) {
+                //  Called when a rewarded video is clicked.
+            }
+
+            @Override
+            public void onRewardedVideoClosed(String adUnitId) {
+                // Called when a rewarded video is closed. At this point your application should resume.
+                Toast.makeText(getActivity(),"Muchas Gracias!",Toast.LENGTH_LONG).show();
+                MoPubRewardedVideos.loadRewardedVideo(adUnitId);
+            }
+
+            @Override
+            public void onRewardedVideoCompleted(Set<String> adUnitIds, MoPubReward reward) {
+                // Called when a rewarded video is completed and the user should be rewarded.
+                // You can query the reward object with boolean isSuccessful(), String getLabel(), and int getAmount().
+            }
+        };
+
+        MoPubRewardedVideos.setRewardedVideoListener(rewardedVideoListener);
 
         //Attaching the listener to the buttons
         editButton = view.findViewById(R.id.edit_button);
@@ -286,42 +327,5 @@ public class Settings extends Fragment implements View.OnClickListener, MoPubRew
 
     public String getTabName() {
         return tabName;
-    }
-
-    @Override
-    public void onRewardedVideoLoadSuccess(String adUnitId) {
-                // Called when the video for the given adUnitId has loaded. At this point you should be able to call MoPubRewardedVideos.showRewardedVideo(String) to show the video.
-        MoPubRewardedVideos.showRewardedVideo(adUnitId);
-    }
-    @Override
-    public void onRewardedVideoLoadFailure(String adUnitId, MoPubErrorCode errorCode) {
-        // Called when a video fails to load for the given adUnitId. The provided error code will provide more insight into the reason for the failure to load.
-    }
-
-    @Override
-    public void onRewardedVideoStarted(String adUnitId) {
-        // Called when a rewarded video starts playing.
-    }
-
-    @Override
-    public void onRewardedVideoPlaybackError(String adUnitId, MoPubErrorCode errorCode) {
-        //  Called when there is an error during video playback.
-    }
-
-    @Override
-    public void onRewardedVideoClicked(String adUnitId) {
-        //  Called when a rewarded video is clicked.
-    }
-
-    @Override
-    public void onRewardedVideoClosed(String adUnitId) {
-        // Called when a rewarded video is closed. At this point your application should resume.
-        MoPubRewardedVideos.loadRewardedVideo(adUnitId);
-    }
-
-    @Override
-    public void onRewardedVideoCompleted(Set<String> adUnitIds, MoPubReward reward) {
-        // Called when a rewarded video is completed and the user should be rewarded.
-        // You can query the reward object with boolean isSuccessful(), String getLabel(), and int getAmount().
     }
 }

@@ -92,9 +92,16 @@ public class AboutPermission extends AppCompatActivity {
                 List<ContactResult> results = MultiContactPicker.obtainResult(data);
                 results.size();
 
-                for(int i = 0; i < results.size(); i++){
-                    String phoneNumber = results.get(i).getPhoneNumbers().get(0).getNumber().replaceAll("[^0-9]", "");
-                    insertContact(results.get(i).getDisplayName(),phoneNumber);
+                if(results.size() > 20){
+                    for(int i = 0; i < 20; i++){
+                        String phoneNumber = results.get(i).getPhoneNumbers().get(0) .getNumber().replaceAll("[^0-9]", "");
+                        insertContact(results.get(i).getDisplayName(),phoneNumber);
+                    }
+                } else {
+                    for(int i = 0; i < results.size(); i++){
+                        String phoneNumber = results.get(i).getPhoneNumbers().get(0).getNumber().replaceAll("[^0-9]", "");
+                        insertContact(results.get(i).getDisplayName(),phoneNumber);
+                    }
                 }
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
